@@ -19,7 +19,7 @@ async fn create_db_connection() -> Client {
 }
 
 fn main() {
-    let db = create_db_connection();
+    let _db = create_db_connection();
     // I think I need to create a DB struct that has all the database methods there
     // that way the entire struct has access to the connection and that way I don't
     // need to figure out how to make a global connection variable
