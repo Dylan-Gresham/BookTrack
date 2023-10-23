@@ -8,7 +8,7 @@ export default function Header({homeBtnClick}) {
     return (
         <div className="headerContainer">
             <button className="homeButton" onClick={homeBtnClick} type="button">
-                {/*Icon Here*/}
+                Home
             </button>
             <div className="rightHeaderButtons">
                 <button className="changeViewButton" onClick={changeView} type="button">

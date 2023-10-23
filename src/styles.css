@@ -107,3 +107,42 @@ button {
     background-color: #0f0f0f69;
   }
 }
+
+body {
+  padding: 0 1.5rem;
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 6fr;
+  gap: 2rem;
+}
+
+.mainContainer {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 6fr;
+  gap: 1rem;
+}
+
+.cardList {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.bookCard {
+  width: 200px;
+  height: 350px;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.bookCard > h3 {
+  background-color: rgba(0, 0, 0, 0.4);
+  color: white;
+  margin-top: auto;
+  padding: 0.5rem;
+}
