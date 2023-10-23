@@ -24,7 +24,8 @@ fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let _db = DB::create_db_connection(
         "libsql://booktrack-db-dylan-gresham.turso.io",
          "TOKEN");
