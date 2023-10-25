@@ -27,7 +27,7 @@ export default function Header({homeBtnClick, addBtnClick}) {
                     Add Book
                 </button>
             </div>
-            <AddModal open={modal} addFunc={addBtnClick}></AddModal>
+            <AddModal open={modal} addFunc={addBtnClick} setModal={setModal}></AddModal>
         </div>
     );
 }
