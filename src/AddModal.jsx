@@ -1,18 +1,10 @@
 function AddModal({open, addFunc, setModal}) {
     function closeProperly() {
-        /*
-         * Close the modal properly without doing any submission or form validation
-         */
-
         document.getElementById('addModal').close(); // Close the modal
         setModal(false); // Update the modal state in Header.jsx
     }
 
     function validateEverything() {
-        /*
-         * Do input validation
-         * If everything passes --> Create book obj, close modal, call addFunc(book)
-         */
         let title = undefined;
         let author = undefined;
         let pageCount = undefined;
