@@ -8,13 +8,13 @@ struct DB {
 }
 
 impl DB {
-    async fn create_db_connection(db_url: &str, db_auth_token: &str) -> Self {
-        Self {
-            connection: libsql_client::Client::from_config(libsql_client::Config {
+    async fn create_db_connection(db_url: &str, db_auth_token: &str) -> libsql_client::Client {
+        let connection_result = libsql_client::Client::from_config(libsql_client::Config {
                 url: url::Url::parse(db_url).unwrap(),
                 auth_token: Some(String::from(db_auth_token)),
-            }).await.unwrap(),
-        }
+            }).await.unwrap();
+
+        connection_result
     }
 }
 
