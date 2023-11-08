@@ -248,7 +248,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "book-api"
+name = "book_api"
 version = "0.1.0"
 dependencies = [
  "reqwest",
@@ -260,7 +260,7 @@ dependencies = [
 name = "book_track"
 version = "0.0.0"
 dependencies = [
- "book-api",
+ "book_api",
  "libsql-client",
  "serde",
  "serde_json",
