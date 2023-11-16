@@ -29,6 +29,11 @@ function App() {
           <div className="cardList">
             <BookCard title={"Martial Peak"}></BookCard>
             <BookCard backgroundUrl={"https://upload.wikimedia.org/wikipedia/en/9/99/Solo_Leveling_Webtoon.png"} title={"Solo Leveling"}></BookCard>
+              {books.map( (book) => {
+                  return (
+                      <BookCard title={book.title} backgroundUrl={book.thumbnailUrl}></BookCard>
+                  )
+              })}
           </div>
         </div>
     );

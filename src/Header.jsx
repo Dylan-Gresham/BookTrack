@@ -14,6 +14,14 @@ export default function Header({homeBtnClick, addBtnClick}) {
         setModal(true);
     }
 
+    if(!document.body.classList.contains("modal") && modal) {
+        document.body.classList.add("modal");
+        document.documentElement.classList.add("modal");
+    } else if(document.body.classList.contains("modal") && !modal) {
+        document.body.classList.remove("modal");
+        document.documentElement.classList.remove("modal");
+    }
+
     return (
         <div className="headerContainer">
             <button className="homeButton" onClick={homeBtnClick} type="button">
