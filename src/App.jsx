@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { invoke } from "@tauri-apps/api/tauri";
-import "./App.css";
 import Header from "./Header";
 import BookCard from "./BookCard.jsx";
 
