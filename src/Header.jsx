@@ -1,23 +1,25 @@
 import {useState} from "react";
 import AddModal from "./AddModal.jsx"
 
-export default function Header({homeBtnClick, addBtnClick}) {
-    const [modal, setModal] = useState(false);
-
+export default function Header({homeBtnClick, addBtnClick, modalBooks}) {
     function changeView() {
         /* Display a modal for user to select a view to change to */
 
         /* Callback to `App.jsx` to change the view appropriately */
     }
 
-    function handleAddButtonClick() {
-        setModal(true);
+    function handleSetNewBook(param) {
+        if(param === null) {
+            addBtnClick(null, false, false);
+        } else {
+            addBtnClick(param, false, false);
+        }
     }
 
-    if(!document.body.classList.contains("modal") && modal) {
+    if(!document.body.classList.contains("modal") && modalBooks.modal) {
         document.body.classList.add("modal");
         document.documentElement.classList.add("modal");
-    } else if(document.body.classList.contains("modal") && !modal) {
+    } else if(document.body.classList.contains("modal") && !modalBooks.modal) {
         document.body.classList.remove("modal");
         document.documentElement.classList.remove("modal");
     }
@@ -31,11 +33,11 @@ export default function Header({homeBtnClick, addBtnClick}) {
                 <button className="changeViewButton" onClick={changeView} type="button">
                     Change View
                 </button>
-                <button className="addButton" onClick={handleAddButtonClick} type="button">
+                <button className="addButton" onClick={() => addBtnClick(null, false, true)} type="button">
                     Add Book
                 </button>
             </div>
-            <AddModal open={modal} addFunc={addBtnClick} setModal={setModal}></AddModal>
+            <AddModal open={modalBooks.modal} addFunc={handleSetNewBook}></AddModal>
         </div>
     );
 }

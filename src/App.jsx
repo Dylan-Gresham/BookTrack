@@ -5,7 +5,11 @@ import BookCard from "./BookCard.jsx";
 
 function App() {
   const [home, setHome] = useState(true);
-  const [books, setBooks] = useState([{title: "Martial Peak", thumbnailUrl: undefined}, {title: "Solo Leveling", thumbnailUrl: "https://upload.wikimedia.org/wikipedia/en/9/99/Solo_Leveling_Webtoon.png"}]);
+  const [modalBooks, setModalBooks] = useState({
+      modal: false,
+      isComic: false,
+      books: [{title: "Martial Peak", thumbnailUrl: undefined}, {title: "Solo Leveling", thumbnailUrl: "https://upload.wikimedia.org/wikipedia/en/9/99/Solo_Leveling_Webtoon.png"}],
+  });
 
   function handleHomeButton() {
     if(!home) {
@@ -13,11 +17,29 @@ function App() {
     }
   }
 
-  function handleAddButton(book) {
-      if(typeof book === 'object') {
-          let newBooks = books;
+  function handleAddButton(book, isComic, modality) {
+      if(book !== null) {
+          let newBooks = modalBooks.books;
           newBooks.push(book);
-          setBooks(newBooks);
+          if(modality === null) {
+              setModalBooks({modal: false, isComic: false, books: newBooks});
+          } else {
+              setModalBooks({modal: modality, isComic: false, books: newBooks});
+          }
+      } else {
+          if(isComic === null) {
+              if(modality === null) {
+                  setModalBooks({...modalBooks});
+              } else {
+                  setModalBooks({...modalBooks, modal: modality, isComic: false});
+              }
+          } else {
+              if(modality === null) {
+                  setModalBooks({...modalBooks, isComic: isComic});
+              } else {
+                  setModalBooks({...modalBooks, modal: modality, isComic: isComic});
+              }
+          }
       }
   }
 
@@ -26,9 +48,9 @@ function App() {
   if(home) {
     return (
         <div className="mainContainer">
-          <Header homeBtnClick={handleHomeButton} addBtnClick={handleAddButton} />
+          <Header homeBtnClick={handleHomeButton} addBtnClick={handleAddButton} modalBooks={modalBooks} />
           <div className="cardList">
-              {books.map( (book) => {
+              {modalBooks.books.map( (book) => {
                   return (
                       <BookCard title={book.title} backgroundUrl={book.thumbnailUrl} key={key++}></BookCard>
                   )
@@ -39,7 +61,7 @@ function App() {
   } else {
     return (
         <div className="mainContainer">
-          <Header homeBtnClick={handleHomeButton} />
+          <Header homeBtnClick={handleHomeButton} addBtnClick={handleAddButton} modalBooks={modalBooks} setModalBooks={setModalBooks} />
         </div>
     )
   }

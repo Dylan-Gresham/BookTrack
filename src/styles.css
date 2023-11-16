@@ -109,6 +109,18 @@ button {
   align-items: center;
 }
 
+#bookAuthorInput {
+  min-width: 150px;
+  max-width: 1000px;
+  width: 95%;
+}
+
+#bookTitleInput {
+  min-width: 150px;
+  max-width: 1000px;
+  width: 95%;
+}
+
 #bookThumbnailInput {
   min-width: 150px;
   max-width: 1000px;
@@ -126,12 +138,24 @@ button {
   cursor: pointer;
 }
 
+textarea:hover,
+input:hover,
 button:hover {
   border-color: #396cd8;
 }
+
+textarea:active,
+textarea:focus,
+input:active,
+input:focus,
 button:active {
   border-color: #396cd8;
   background-color: #e8e8e8;
+}
+
+textarea:focus:hover,
+input:focus:hover {
+  border-width: 2px;
 }
 
 input,
