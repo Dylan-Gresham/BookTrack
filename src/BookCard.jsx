@@ -1,4 +1,6 @@
 function BookCard({backgroundUrl, title}) {
+    console.log(title);
+    console.log(backgroundUrl);
     if(backgroundUrl === undefined) {
         return (
             <div className="bookCard" style={{backgroundColor: '#8875ff'}}>
