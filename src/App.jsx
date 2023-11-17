@@ -8,7 +8,8 @@ function App() {
   const [modalBooks, setModalBooks] = useState({
       modal: false,
       isComic: false,
-      books: [{title: "Martial Peak", thumbnailUrl: undefined}, {title: "Solo Leveling", thumbnailUrl: "https://upload.wikimedia.org/wikipedia/en/9/99/Solo_Leveling_Webtoon.png"}],
+      books: [],
+      bookModal: false,
   });
 
   function handleHomeButton() {

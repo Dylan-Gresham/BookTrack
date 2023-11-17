@@ -94,6 +94,7 @@ button {
   width: 200vw;
   height: 200vh;
   background-color: #8875ff;
+  opacity: 0.45;
 }
 
 #addModal > .addForm {
