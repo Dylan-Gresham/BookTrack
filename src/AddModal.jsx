@@ -10,8 +10,9 @@ function AddModal({open, addFunc}) {
     function validateEverything() {
         let title = undefined;
         let author = undefined;
-        let pageCount = undefined;
-        let chapterCount = undefined;
+        let currentCount = undefined;
+        let totalPageCount = undefined;
+        let totalChapterCount = undefined;
         let isComic = false;
         let rating = undefined;
         let thumbnailUrl = undefined;
@@ -59,46 +60,68 @@ function AddModal({open, addFunc}) {
             }
         }
 
+        const currentCountInput = document.getElementById('bookCurrentCount');
+        if(currentCount.value !== null && currentCount.value !== undefined &&
+           currentCount.value !== '') {
+            if(currentCountInput.classList.contains('invalid-input')) {
+                currentCountInput.classList.toggle('invalid-input');
+            }
+
+            if(!currentCountInput.classList.contains('valid-input')) {
+                currentCountInput.classList.toggle('valid-input');
+            }
+
+            currentCount = currentCountInput.value;
+        } else {
+            if(currentCountInput.classList.contains('valid-input')) {
+                currentCountInput.classList.toggle('valid-input');
+            }
+
+            if(!currentCountInput.classList.contains('invalid-input')) {
+                currentCountInput.classList.toggle('invalid-input');
+            }
+        }
+
         if(isComic) {
-            const chapterCountInput = document.getElementById('bookChaptersInput');
-            if(chapterCountInput.value !== null && chapterCountInput.value !== undefined && chapterCountInput.value !== '') {
-                if(chapterCountInput.classList.contains('invalid-input')) {
-                    chapterCountInput.classList.toggle('invalid-input');
+            const totalChapterCountInput = document.getElementById('bookChaptersInput');
+            if(totalChapterCountInput.value !== null && totalChapterCountInput.value !== undefined && totalChapterCountInput.value !== '') {
+                if(totalChapterCountInput.classList.contains('invalid-input')) {
+                    totalChapterCountInput.classList.toggle('invalid-input');
                 }
 
-                if(!chapterCountInput.classList.contains('valid-input')) {
-                    chapterCountInput.classList.toggle('valid-input');
+                if(!totalChapterCountInput.classList.contains('valid-input')) {
+                    totalChapterCountInput.classList.toggle('valid-input');
                 }
 
-                chapterCount = parseInt(chapterCountInput.value);
+                totalChapterCount = parseInt(totalChapterCountInput.value);
             } else {
-                if(chapterCountInput.classList.contains('valid-input')) {
-                    chapterCountInput.classList.toggle('valid-input');
+                if(totalChapterCountInput.classList.contains('valid-input')) {
+                    totalChapterCountInput.classList.toggle('valid-input');
                 }
 
-                if(!chapterCountInput.classList.contains('invalid-input')) {
-                    chapterCountInput.classList.toggle('invalid-input');
+                if(!totalChapterCountInput.classList.contains('invalid-input')) {
+                    totalChapterCountInput.classList.toggle('invalid-input');
                 }
             }
         } else {
-            const pageCountInput = document.getElementById('bookPagesInput');
-            if(pageCountInput.value !== null && pageCountInput.value !== undefined && pageCountInput.value !== '') {
-                if(pageCountInput.classList.contains('invalid-input')) {
-                    pageCountInput.classList.toggle('invalid-input');
+            const totalPageCountInput = document.getElementById('bookPagesInput');
+            if(totalPageCountInput.value !== null && totalPageCountInput.value !== undefined && totalPageCountInput.value !== '') {
+                if(totalPageCountInput.classList.contains('invalid-input')) {
+                    totalPageCountInput.classList.toggle('invalid-input');
                 }
 
-                if(!pageCountInput.classList.contains('valid-input')) {
-                    pageCountInput.classList.toggle('valid-input');
+                if(!totalPageCountInput.classList.contains('valid-input')) {
+                    totalPageCountInput.classList.toggle('valid-input');
                 }
 
-                pageCount = parseInt(pageCountInput.value);
+                totalPageCount = parseInt(totalPageCountInput.value);
             } else {
-                if(pageCountInput.classList.contains('valid-input')) {
-                    pageCountInput.classList.toggle('valid-input');
+                if(totalPageCountInput.classList.contains('valid-input')) {
+                    totalPageCountInput.classList.toggle('valid-input');
                 }
 
-                if(!pageCountInput.classList.contains('invalid-input')) {
-                    pageCountInput.classList.toggle('invalid-input');
+                if(!totalPageCountInput.classList.contains('invalid-input')) {
+                    totalPageCountInput.classList.toggle('invalid-input');
                 }
             }
         }
@@ -167,7 +190,8 @@ function AddModal({open, addFunc}) {
         }
 
         let book = undefined;
-        if(title === undefined || author === undefined || (pageCount === undefined && chapterCount === undefined)
+        if(title === undefined || author === undefined || currentCount === undefined
+           || (totalPageCount === undefined && totalChapterCount === undefined)
            || rating === undefined || comments === undefined) {
             return;
         } else {
@@ -180,10 +204,10 @@ function AddModal({open, addFunc}) {
                 isComic: isComic,
             };
 
-            if(pageCount === undefined) {
-                book = {...book, chapters: chapterCount};
+            if(totalPageCount === undefined) {
+                book = {...book, chapters: totalChapterCount, currentChapters: currentCount};
             } else {
-                book = {...book, pages: pageCount};
+                book = {...book, pages: totalPageCount, currPages: currentCount};
             }
         }
 
@@ -211,12 +235,17 @@ function AddModal({open, addFunc}) {
                                    placeholder="Christopher Paolini/Asura Scans" type="text"/>
                         </div>
                         <div className="labelInputContainer">
+                            <label htmlFor="bookCurrentCountInput" id="bookCurrentCountLabel">Total Chapters You've Read: </label>
+                            <input id="bookCurrentCountInput" name="bookCurrentCountInput" className="addInput"
+                                   placeholder="0" type="number" min="0" max="100000"/>
+                        </div>
+                        <div className="labelInputContainer">
                             <label htmlFor="bookChaptersInput" id="bookChaptersLabel">Chapters: </label>
                             <input id="bookChaptersInput" name="bookChaptersInput" className="addInput"
                                    placeholder="40" type="number" min="0" max="100000"/>
                         </div>
                         <div className="labelInputContainer">
-                            <label htmlFor="bookComicInput" id="bookComicLabel">Is a comic?: </label>
+                            <label htmlFor="bookComicInput" id="bookComicLabel">Is it a comic?: </label>
                             <input id="bookComicInput" name="bookComicInput" className="addInput"
                                    type="checkbox" onClick={() => {
                                 if(isComic) {
@@ -274,12 +303,17 @@ function AddModal({open, addFunc}) {
                                    placeholder="Christopher Paolini" type="text"/>
                         </div>
                         <div className="labelInputContainer">
+                            <label htmlFor="bookCurrentCountInput" id="bookCurrentCountLabel">Total Pages You've Read: </label>
+                            <input id="bookCurrentCountInput" name="bookCurrentCountInput" className="addInput"
+                                   placeholder="0" type="number" min="0" max="100000"/>
+                        </div>
+                        <div className="labelInputContainer">
                             <label htmlFor="bookPagesInput" id="bookPagesLabel">Pages: </label>
                             <input id="bookPagesInput" name="bookPagesInput" className="addInput"
                                    placeholder="879" type="number" min="0" max="100000"/>
                         </div>
                         <div className="labelInputContainer">
-                            <label htmlFor="bookComicInput" id="bookComicLabel">Is a comic?: </label>
+                            <label htmlFor="bookComicInput" id="bookComicLabel">Is it a comic?: </label>
                             <input id="bookComicInput" name="bookComicInput" className="addInput"
                                    type="checkbox" onClick={() => {
                                        if(isComic) {

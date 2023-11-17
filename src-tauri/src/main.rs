@@ -4,7 +4,7 @@
 use libsql_client::Client;
 
 struct DB {
-    connection: Client
+    _connection: Client
 }
 
 impl DB {
