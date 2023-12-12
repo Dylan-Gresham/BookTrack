@@ -1,20 +1,48 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use dirs;
 use libsql_client::Client;
 use std::fs;
-use dirs;
+
+#[derive(Clone)]
+struct DbOptions {
+    url: Box<String>,
+    token: Box<String>,
+}
+
+impl DbOptions {
+    fn new(url: Box<String>, token: Box<String>) -> Self {
+        Self { url, token }
+    }
+
+    fn new_from_string(url: String, token: String) -> Self {
+        Self {
+            url: Box::new(url),
+            token: Box::new(token),
+        }
+    }
+
+    fn new_empty() -> Self {
+        Self {
+            url: Box::new(String::from("")),
+            token: Box::new(String::from("")),
+        }
+    }
+}
 
 struct DB {
-    _connection: Client
+    connection: Client,
 }
 
 impl DB {
     async fn create_db_connection(db_url: &str, db_auth_token: &str) -> libsql_client::Client {
         let connection_result = libsql_client::Client::from_config(libsql_client::Config {
-                url: url::Url::parse(db_url).unwrap(),
-                auth_token: Some(String::from(db_auth_token)),
-            }).await.unwrap();
+            url: url::Url::parse(db_url).unwrap(),
+            auth_token: Some(String::from(db_auth_token)),
+        })
+        .await
+        .unwrap();
 
         connection_result
     }
@@ -31,7 +59,7 @@ fn update_db_connection(_db_token: &str) -> () {
     todo!()
 }
 
-fn create_parse_config() -> Result<(&'static str, &'static str), String> {
+fn create_parse_config(mut db_options: DbOptions) -> Result<(), String> {
     let home_dir_path_opt = dirs::home_dir();
     let home_dir_path = match home_dir_path_opt {
         Some(item) => item,
@@ -40,7 +68,11 @@ fn create_parse_config() -> Result<(&'static str, &'static str), String> {
     let home_dir_str_opt = home_dir_path.to_str();
     let home_dir = match home_dir_str_opt {
         Some(item) => item,
-        None => return Err(String::from("ERROR: Unable to parse home directory as a `&str`")),
+        None => {
+            return Err(String::from(
+                "ERROR: Unable to parse home directory as a `&str`",
+            ))
+        }
     };
     let config_dir_format = format!("{}/config/BookTrackConfig", home_dir);
     let config_dir = config_dir_format.as_str();
@@ -48,26 +80,70 @@ fn create_parse_config() -> Result<(&'static str, &'static str), String> {
     let dir_creation_result = fs::create_dir_all(config_dir);
     match dir_creation_result {
         Ok(_) => (),
-        Err(e) => return Err(String::from(
-            format!("Error encountered while attempting to create ~/config/BookTrack/ : {e}")
-            ))
+        Err(e) => {
+            return Err(String::from(format!(
+                "Error encountered while attempting to create ~/config/BookTrackConfig/ : {e}"
+            )))
+        }
     };
 
-    Ok(("https://todo.com", "todo!"))
+    let dir = match fs::read_dir(config_dir) {
+        Ok(dir) => dir,
+        Err(e) => {
+            return Err(String::from(format!(
+            "Error encountered while attempting to read the dir ~/config/BookTrackConfig/ : {e}"
+        )))
+        }
+    };
+
+    let mut found_config_file: bool = false;
+    for file in dir {
+        let file = match file {
+            Ok(file) => file,
+            Err(e) => {
+                return Err(String::from(format!(
+                    "ERROR: Error happened while attempting to read files in the config dir : {e}"
+                )))
+            }
+        };
+
+        found_config_file = file.file_name() == "library_options.txt";
+    }
+
+    if found_config_file {
+        let file = fs::read_to_string(format!("{config_dir}/library_options.txt"))
+            .expect("ERROR: Config file `library_options.txt` couldn't be read");
+
+        let lines = file.lines().map(|line| line.trim()).collect::<Vec<&str>>();
+        db_options.url = Box::new(lines[0].to_string());
+        db_options.token = Box::new(lines[1].to_string());
+
+        return Ok(());
+    } else {
+        // Run user through setup/Ask user for their DB url & token
+    }
+
+    Ok(())
 }
 
 #[tokio::main]
 async fn main() -> Result<(), String> {
-    let (url, db_token) = match create_parse_config() {
-        Ok(tuple) => tuple,
+    // TODO: Need to figure out how to get the url and token from the struct
+
+    let db_opts: DbOptions = DbOptions::new_empty();
+    match create_parse_config(db_opts) {
+        Ok(_opts) => (),
         Err(e) => return Err(e),
     };
 
-    let _db = DB::create_db_connection(url, db_token).await;
+    let db_url = db_opts.url.to_string();
+    let db_token = db_opts.token.to_string();
+
+    let _db = DB::create_db_connection(&db_url, &db_token).await;
 
     tauri::Builder::default()
-    .invoke_handler(tauri::generate_handler![greet, update_db_connection])
-    .run(tauri::generate_context!())
-    .expect("error while running tauri application");
+        .invoke_handler(tauri::generate_handler![greet, update_db_connection])
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
     Ok(())
 }
