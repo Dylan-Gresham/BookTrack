@@ -3,6 +3,7 @@
 
 use libsql_client::Client;
 use std::fs;
+use dirs;
 
 struct DB {
     _connection: Client
@@ -30,28 +31,43 @@ fn update_db_connection(_db_token: &str) -> () {
     todo!()
 }
 
-#[tokio::main]
-async fn main() -> Result<(), String> {
-    let _db = DB::create_db_connection(
-        "libsql://booktrack-db-dylan-gresham.turso.io",
-         "TOKEN").await;
+fn create_parse_config() -> Result<(&'static str, &'static str), String> {
+    let home_dir_path_opt = dirs::home_dir();
+    let home_dir_path = match home_dir_path_opt {
+        Some(item) => item,
+        None => return Err(String::from("ERROR: Unable to find a home directory")),
+    };
+    let home_dir_str_opt = home_dir_path.to_str();
+    let home_dir = match home_dir_str_opt {
+        Some(item) => item,
+        None => return Err(String::from("ERROR: Unable to parse home directory as a `&str`")),
+    };
+    let config_dir_format = format!("{}/config/BookTrackConfig", home_dir);
+    let config_dir = config_dir_format.as_str();
 
-    let dir_creation_result = fs::create_dir_all("~/config/BookTrack/");
-    let (dir_creation_continue, error) = match dir_creation_result {
-        Ok(_) => (true, String::from("")),
-        Err(e) => {
-            eprintln!("Error encountered while attempting to create ~/config/BookTrack/ : {e}");
-            (false, e.to_string())
-        }
+    let dir_creation_result = fs::create_dir_all(config_dir);
+    match dir_creation_result {
+        Ok(_) => (),
+        Err(e) => return Err(String::from(
+            format!("Error encountered while attempting to create ~/config/BookTrack/ : {e}")
+            ))
     };
 
-    if dir_creation_continue {
-        tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet, update_db_connection])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
-        Ok(())
-    } else {
-        Err(error)
-    }
+    Ok(("https://todo.com", "todo!"))
+}
+
+#[tokio::main]
+async fn main() -> Result<(), String> {
+    let (url, db_token) = match create_parse_config() {
+        Ok(tuple) => tuple,
+        Err(e) => return Err(e),
+    };
+
+    let _db = DB::create_db_connection(url, db_token).await;
+
+    tauri::Builder::default()
+    .invoke_handler(tauri::generate_handler![greet, update_db_connection])
+    .run(tauri::generate_context!())
+    .expect("error while running tauri application");
+    Ok(())
 }
