@@ -60,9 +60,9 @@ function AddModal({open, addFunc}) {
             }
         }
 
-        const currentCountInput = document.getElementById('bookCurrentCount');
-        if(currentCount.value !== null && currentCount.value !== undefined &&
-           currentCount.value !== '') {
+        const currentCountInput = document.getElementById('bookCurrentCountInput');
+        if(currentCountInput.value !== null && currentCountInput.value !== undefined &&
+           currentCountInput.value !== '') {
             if(currentCountInput.classList.contains('invalid-input')) {
                 currentCountInput.classList.toggle('invalid-input');
             }
