@@ -31,7 +31,7 @@ export default function Header({homeBtnClick, addBtnClick, modalBooks}) {
             </button>
             <div className="rightHeaderButtons">
                 <button className="changeViewButton" onClick={changeView} type="button">
-                    Change View
+                    Go To...
                 </button>
                 <button className="addButton" onClick={() => addBtnClick(null, false, true)} type="button">
                     Add Book

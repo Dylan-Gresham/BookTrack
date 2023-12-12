@@ -263,3 +263,10 @@ body {
   justify-content: center;
   align-items: center;
 }
+
+.rightHeaderButtons {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  align-items: center;
+}
