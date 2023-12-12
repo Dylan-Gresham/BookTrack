@@ -335,7 +335,7 @@ function AddModal({open, addFunc}) {
                         <div className="labelInputContainer">
                             <label htmlFor="bookCommentsInput" id="bookCommentsLabel">Comments: </label>
                             <textarea id="bookCommentsInput" name="bookCommentsInput" className="addInput"
-                                      placeholder="Amazing book, 10/10!" rows="10"/>
+                                      placeholder="Amazing book, 10/10!" rows="5" cols="12"/>
                         </div>
                         <div className="buttonContainer">
                             <button className="addInputButton" id="addInputCloseButton" type="submit"
