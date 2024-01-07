@@ -16,7 +16,7 @@ impl DbOptions {
         Self { url, token }
     }
 
-    fn new_from_string(url: String, token: String) -> Self {
+    fn new_from_strings(url: String, token: String) -> Self {
         Self {
             url: Box::new(url),
             token: Box::new(token),
@@ -59,7 +59,7 @@ fn update_db_connection(_db_token: &str) -> () {
     todo!()
 }
 
-fn create_parse_config(mut db_options: DbOptions) -> Result<(), String> {
+fn create_parse_config() -> Result<DbOptions, String> {
     let home_dir_path_opt = dirs::home_dir();
     let home_dir_path = match home_dir_path_opt {
         Some(item) => item,
@@ -115,26 +115,20 @@ fn create_parse_config(mut db_options: DbOptions) -> Result<(), String> {
             .expect("ERROR: Config file `library_options.txt` couldn't be read");
 
         let lines = file.lines().map(|line| line.trim()).collect::<Vec<&str>>();
-        db_options.url = Box::new(lines[0].to_string());
-        db_options.token = Box::new(lines[1].to_string());
+        let db_options = DbOptions::new_from_strings(lines[0].to_string(), lines[1].to_string());
 
-        return Ok(());
+        return Ok(db_options);
     } else {
         // Run user through setup/Ask user for their DB url & token
+        Err(String::from("Unimplemented portion"))
     }
-
-    Ok(())
 }
 
 #[tokio::main]
 async fn main() -> Result<(), String> {
     // TODO: Need to figure out how to get the url and token from the struct
 
-    let db_opts: DbOptions = DbOptions::new_empty();
-    match create_parse_config(db_opts) {
-        Ok(_opts) => (),
-        Err(e) => return Err(e),
-    };
+    let db_opts: DbOptions = create_parse_config().unwrap_or_else(|e| DbOptions::new_empty());
 
     let db_url = db_opts.url.to_string();
     let db_token = db_opts.token.to_string();

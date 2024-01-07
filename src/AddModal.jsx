@@ -10,6 +10,7 @@ function AddModal({open, addFunc}) {
     function validateEverything() {
         let title = undefined;
         let author = undefined;
+        let currentStatus = undefined;
         let currentCount = undefined;
         let totalPageCount = undefined;
         let totalChapterCount = undefined;
@@ -59,6 +60,9 @@ function AddModal({open, addFunc}) {
                 authorInput.classList.toggle('invalid-input');
             }
         }
+
+        const currentStatusInput = document.getElementById('bookStatusInput');
+        currentStatus = currentStatusInput.options[currentStatusInput.selectedIndex].text;
 
         const currentCountInput = document.getElementById('bookCurrentCountInput');
         if(currentCountInput.value !== null && currentCountInput.value !== undefined &&
@@ -202,6 +206,7 @@ function AddModal({open, addFunc}) {
                 comments: comments,
                 thumbnailUrl: thumbnailUrl,
                 isComic: isComic,
+                status: currentStatus,
             };
 
             if(totalPageCount === undefined) {
@@ -227,32 +232,44 @@ function AddModal({open, addFunc}) {
                         <div className="labelInputContainer">
                             <label htmlFor="bookTitleInput" id="bookTitleLabel">Title: </label>
                             <input id="bookTitleInput" name="bookTitleInput" className="addInput"
-                                   placeholder="To Sleep in a Sea of Stars" type="text"/>
+                                   placeholder="Martial Peak" type="text"/>
                         </div>
                         <div className="labelInputContainer">
                             <label htmlFor="bookAuthorInput" id="bookAuthorLabel">Author/Source: </label>
                             <input id="bookAuthorInput" name="bookAuthorInput" className="addInput"
-                                   placeholder="Christopher Paolini/Asura Scans" type="text"/>
+                                   placeholder="Momo/Asura Scans" type="text"/>
                         </div>
                         <div className="labelInputContainer">
-                            <label htmlFor="bookCurrentCountInput" id="bookCurrentCountLabel">Total Chapters You've Read: </label>
+                            <label htmlFor="bookStatusInput" id="bookStatusLabel">Status (click to change): </label>
+                            <select id="bookStatusInput" name="bookStatusInput" className="addSelect">
+                                <option value="Planned">Plan To Read</option>
+                                <option value="Reading">Reading</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Aside">Aside</option>
+                                <option value="Dropped">Dropped</option>
+                            </select>
+                        </div>
+                        <div className="labelInputContainer">
+                            <label htmlFor="bookCurrentCountInput" id="bookCurrentCountLabel">Total Chapters You've
+                                Read: </label>
                             <input id="bookCurrentCountInput" name="bookCurrentCountInput" className="addInput"
                                    placeholder="0" type="number" min="0" max="100000"/>
                         </div>
                         <div className="labelInputContainer">
                             <label htmlFor="bookChaptersInput" id="bookChaptersLabel">Chapters: </label>
                             <input id="bookChaptersInput" name="bookChaptersInput" className="addInput"
-                                   placeholder="40" type="number" min="0" max="100000"/>
+                                   placeholder="100" type="number" min="0" max="100000"/>
                         </div>
                         <div className="labelInputContainer">
-                            <label htmlFor="bookComicInput" id="bookComicLabel">Is it a comic?: </label>
+                            <label htmlFor="bookComicInput" id="bookComicLabel">Is this a novel?: </label>
                             <input id="bookComicInput" name="bookComicInput" className="addInput"
                                    type="checkbox" onClick={() => {
-                                if(isComic) {
+                                if (isComic) {
                                     setIsComic(false);
                                 } else {
                                     setIsComic(true);
-                                }}}/>
+                                }
+                            }}/>
                         </div>
                         <div className="labelInputContainer">
                             <label htmlFor="bookRatingInput" id="bookRatingLabel">Rating: </label>
@@ -267,7 +284,7 @@ function AddModal({open, addFunc}) {
                         <div className="labelInputContainer">
                             <label htmlFor="bookCommentsInput" id="bookCommentsLabel">Comments: </label>
                             <textarea id="bookCommentsInput" name="bookCommentsInput" className="addInput"
-                                      placeholder="Amazing book, 10/10!" rows="10"/>
+                                      placeholder="Amazing comic, 10/10, wow!" rows="10"/>
                         </div>
                         <div className="buttonContainer">
                             <button className="addInputButton" id="addInputCloseButton" type="submit"
@@ -283,7 +300,7 @@ function AddModal({open, addFunc}) {
                 </dialog>
             </>
         );
-    } else if(open && !isComic) {
+    } else if (open && !isComic) {
         return (
             <>
                 <div id="dialogBackdrop"></div>
@@ -303,7 +320,18 @@ function AddModal({open, addFunc}) {
                                    placeholder="Christopher Paolini" type="text"/>
                         </div>
                         <div className="labelInputContainer">
-                            <label htmlFor="bookCurrentCountInput" id="bookCurrentCountLabel">Total Pages You've Read: </label>
+                            <label htmlFor="bookStatusInput" id="bookStatusLabel">Status (click to change): </label>
+                            <select id="bookStatusInput" name="bookStatusInput" className="addSelect">
+                                <option value="Planned">Plan To Read</option>
+                                <option value="Reading">Reading</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Aside">Aside</option>
+                                <option value="Dropped">Dropped</option>
+                            </select>
+                        </div>
+                        <div className="labelInputContainer">
+                            <label htmlFor="bookCurrentCountInput" id="bookCurrentCountLabel">Total Pages You've
+                                Read: </label>
                             <input id="bookCurrentCountInput" name="bookCurrentCountInput" className="addInput"
                                    placeholder="0" type="number" min="0" max="100000"/>
                         </div>
@@ -313,14 +341,15 @@ function AddModal({open, addFunc}) {
                                    placeholder="879" type="number" min="0" max="100000"/>
                         </div>
                         <div className="labelInputContainer">
-                            <label htmlFor="bookComicInput" id="bookComicLabel">Is it a comic?: </label>
+                            <label htmlFor="bookComicInput" id="bookComicLabel">Is this a comic?: </label>
                             <input id="bookComicInput" name="bookComicInput" className="addInput"
                                    type="checkbox" onClick={() => {
-                                       if(isComic) {
-                                           setIsComic(false);
-                                       } else {
-                                           setIsComic(true);
-                                       }}}/>
+                                if (isComic) {
+                                    setIsComic(false);
+                                } else {
+                                    setIsComic(true);
+                                }
+                            }}/>
                         </div>
                         <div className="labelInputContainer">
                             <label htmlFor="bookRatingInput" id="bookRatingLabel">Rating: </label>

@@ -53,7 +53,7 @@ function App() {
           <div className="cardList">
               {modalBooks.books.map( (book) => {
                   return (
-                      <BookCard title={book.title} backgroundUrl={book.thumbnailUrl} key={key++}></BookCard>
+                      <BookCard book={book} key={key++}></BookCard>
                   )
               })}
           </div>
