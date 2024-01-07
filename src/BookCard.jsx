@@ -4,6 +4,7 @@ function BookCard({book}) {
     useEffect(() => {
         document.addEventListener('click', (e) => {
             console.log(book);
+            // Printing all books instead of just the one book
         });
         return () => {document.removeEventListener('click', () => {console.log(book);});}
     }, []);
