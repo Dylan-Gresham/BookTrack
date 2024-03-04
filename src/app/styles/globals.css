@@ -1,24 +1,20 @@
 @media (prefers-color-scheme: light) {
-    .root {
-        --bg-color: #263D42;  /* Beaver */
-        --c2: hsl(32, 36, 73);  /* Dun */
-        --c3: hsl(56, 62, 86);  /* Lemon Chiffon */
-        --c4: hsl(75, 100, 94); /* Light Yellow */
-        --c5: hsl(25, 100, 94); /* Linen */
-        --cw: hsl(217, 0, 100); /* White */
-        --cb: hsl(0, 0, 0);     /* Black */
+    html, body {
+        background-color: #9F7E69;
+    }
+
+    button {
+        background-color: #D2BBA0;
     }
 }
 
 @media (prefers-color-scheme: dark) {
-    .root {
-        --bg-color: #263D42; /* Gunmetal */
-        --c2: hsl(311, 14, 49); /* Chinese Violet */
-        --c3: hsl(167, 47, 58); /* Tiffany Blue */
-        --c4: hsl(186, 52, 67); /* Non Photo Blue */
-        --c5: hsl(184, 19, 83); /* Platinum */
-        --cw: hsl(217, 0, 100); /* White */
-        --cb: hsl(0, 0, 0);     /* Black */
+    html, body {
+        background-color: #263D42;
+    }
+
+    button {
+        background-color: #8E6C88;
     }
 }
 
@@ -43,4 +39,11 @@ body {
 button,
 a {
     cursor: pointer;
+}
+
+button {
+    appearance: none;
+    border: 2px solid #121212;
+    border-radius: 12px;
+    color: white;
 }
