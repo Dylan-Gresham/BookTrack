@@ -1,0 +1,28 @@
+.headerContainer {
+    background-color: var(--bg-color);
+    margin-right: 1rem;
+    margin-left: 0.5rem;
+    grid-row: 1;
+    grid-column: 1 / span 3;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.headerContainer * {
+    background-color: transparent;
+}
+
+.headerContainer > h2 {
+    cursor: pointer;
+}
+
+.headerButtonsContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    justify-content: space-between;
+    align-items: center;
+}
+

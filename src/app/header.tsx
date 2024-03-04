@@ -1,10 +1,12 @@
+import styles from './styles/header.module.css';
+
 export default function Header() {
     return (
-        <header className="header-container">
+        <header className={styles.headerContainer}>
             <h2>BookTrack</h2>
-            <div className="header-buttons-container">
-                <button type="button" className="header-button">Register</button>
-                <button type="button" className="header-button">Login</button>
+            <div className={styles.headerButtonsContainer}>
+                <button type="button" className={styles.headerButton}>Register</button>
+                <button type="button" className={styles.headerButton}>Login</button>
             </div>
         </header>
     );

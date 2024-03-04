@@ -1,4 +1,4 @@
-import styles from "./page.module.css";
+import styles from "./styles/page.module.css";
 import { Cormorant_Garamond } from "next/font/google";
 
 const garamond500 = Cormorant_Garamond({ subsets: ["latin"], weight: "500" });
