@@ -1,1 +1,66 @@
+.main {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
 
+.welcomeContainer,
+.typContainer,
+.guideContainer,
+.featuresContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.welcomeContainer > h1 {
+    display: inline;
+    width: 100%;
+    text-align: center;
+}
+
+.welcomeContainer > p {
+    width: 70%;
+    text-align: justify;
+    font-size: clamp(16px, 22px, 28px);
+}
+
+.typContainer > span {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.guideContainer > .guidesContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.featuresContainer > .featureButtons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.featuresContainer > .featureButtons > .featureButton {
+    width: 35%;
+    margin: 0.5rem;
+    cursor: pointer;
+}
+
+.featureButton *,
+.dbButton * {
+    cursor: pointer;
+}
+
+.featuresContainer > .dbButton {
+    width: 72%;
+    margin: 0.5rem;
+}
