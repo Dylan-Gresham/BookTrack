@@ -25,12 +25,12 @@ export default function Home() {
             <div className={styles.guideContainer}>
                 <h1>Guides</h1>
                 <div className={styles.guidesContainer}>
-                    <button type="button" className="guides-button">Setup</button>
-                    <button type="button" className="guides-button">Upgrade</button>
-                    <button type="button" className="guides-button">Manage a Book</button>
-                    <button type="button" className="guides-button">Manage a List</button>
-                    <button type="button" className="guides-button">Manage Your Database</button>
-                    <button type="button" className="guides-button">Download Your Database</button>
+                    <button type="button" className={styles.guideButton}>Setup</button>
+                    <button type="button" className={styles.guideButton}>Upgrade</button>
+                    <button type="button" className={styles.guideButton}>Manage a Book</button>
+                    <button type="button" className={styles.guideButton}>Manage a List</button>
+                    <button type="button" className={styles.guideButton}>Manage Your Database</button>
+                    <button type="button" className={styles.guideButton}>Download Your Database</button>
                 </div>
             </div>
             <div className={styles.featuresContainer}>

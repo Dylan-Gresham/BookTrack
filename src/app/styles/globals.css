@@ -10,16 +10,21 @@
 
 @media (prefers-color-scheme: dark) {
     html, body {
-        background-color: #263D42;
+        background-color: #2E2E3A;
     }
 
     button {
-        background-color: #8E6C88;
+        background-color: #CBC0AE;
     }
 }
 
 * {
     cursor: default;
+}
+
+html, body {
+    min-width: 35vw;
+    min-height: 35vh;
 }
 
 html {
@@ -43,7 +48,7 @@ a {
 
 button {
     appearance: none;
-    border: 2px solid #121212;
+    border: 1px solid #121212;
     border-radius: 12px;
-    color: white;
+    font-size: 1rem;
 }

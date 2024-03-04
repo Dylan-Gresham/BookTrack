@@ -5,8 +5,8 @@ export default function Header() {
         <header className={styles.headerContainer}>
             <h2>BookTrack</h2>
             <div className={styles.headerButtonsContainer}>
-                <button type="button" className={styles.headerButton}>Register</button>
                 <button type="button" className={styles.headerButton}>Login</button>
+                <button type="button" className={styles.headerButton}>Register</button>
             </div>
         </header>
     );

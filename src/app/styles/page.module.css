@@ -17,6 +17,25 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    padding: 0.5rem;
+}
+
+@media (prefers-color-scheme: light) {
+    .welcomeContainer {
+        background-color: black;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    .welcomeContainer,
+    .guideContainer {
+        background-color: #CBC0AE;
+    }
+
+    .typContainer,
+    .featuresContainer{
+        background-color: #5D707F;
+    }
 }
 
 .welcomeContainer > h1 {
@@ -41,6 +60,11 @@
     display: flex;
     flex-wrap: wrap;
     gap: 0.4rem;
+    justify-content: center;
+}
+
+.guideContainer > .guidesContainer > .guideButton {
+    background-color: #5D707F;
 }
 
 .featuresContainer > .featureButtons {
