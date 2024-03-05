@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import styles from '../styles/footer.module.css';
 import { open } from '@tauri-apps/api/shell';

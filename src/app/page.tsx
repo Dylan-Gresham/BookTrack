@@ -1,9 +1,90 @@
+'use client';
+
 import styles from "./styles/page.module.css";
 import { Cormorant_Garamond } from "next/font/google";
+import { useEffect, useRef, MutableRefObject } from 'react';
+import { open } from '@tauri-apps/api/shell';
+
+function openSetup(e: Event) {
+    e.preventDefault();
+
+    open("https://github.com/Dylan-Gresham/BookTrack/blob/nextjs/guides/Setup.md");
+}
+
+function openUpgrade(e: Event) {
+    e.preventDefault();
+
+    open("https://github.com/Dylan-Gresham/BookTrack/blob/nextjs/guides/Upgrade.md");
+}
+
+function openManageBook(e: Event) {
+    e.preventDefault();
+
+    open("https://github.com/Dylan-Gresham/BookTrack/blob/nextjs/guides/Managing_a_Book.md");
+}
+
+function openManageList(e: Event) {
+    e.preventDefault();
+
+    open("https://github.com/Dylan-Gresham/BookTrack/blob/nextjs/guides/Manage_a_List.md");
+}
+
+function openManageDB(e: Event) {
+    e.preventDefault();
+
+    open("https://github.com/Dylan-Gresham/BookTrack/blob/nextjs/guides/Manage_Your_Database.md");
+}
+
+function openDownloadDB(e: Event) {
+    e.preventDefault();
+
+    open("https://github.com/Dylan-Gresham/BookTrack/blob/nextjs/guides/Download_Your_Database.md");
+}
 
 const garamond500 = Cormorant_Garamond({ subsets: ["latin"], weight: "500" });
 
 export default function Home() {
+    const guidesRef = useRef() as MutableRefObject<HTMLDivElement>;
+    function scrollToGuides(e: Event) {
+        e.preventDefault();
+
+        window.scrollTo({
+            top: guidesRef.current.offsetTop,
+            behavior: "smooth"
+        })
+    }
+
+    useEffect(() => {
+        // Get all the buttons
+        const setupButton = document.getElementById('setupButton');
+        const upgradeButton = document.getElementById('upgradeButton');
+        const manageBookButton = document.getElementById('manageBookButton');
+        const manageListButton = document.getElementById('manageListButton');
+        const manageDBButton = document.getElementById('manageDBButton');
+        const downloadDBButton = document.getElementById('downloadDBButton');
+        const getStartedButton = document.getElementById('getStartedButton');
+
+        // Add the listeners on attach
+        setupButton?.addEventListener("click", openSetup);
+        upgradeButton?.addEventListener("click", openUpgrade);
+        manageBookButton?.addEventListener("click", openManageBook);
+        manageListButton?.addEventListener("click", openManageList);
+        manageDBButton?.addEventListener("click", openManageDB);
+        downloadDBButton?.addEventListener("click", openDownloadDB);
+        getStartedButton?.addEventListener("click", scrollToGuides);
+
+        return () => {
+            // Remove the listeners on detach
+            setupButton?.removeEventListener("click", openSetup);
+            upgradeButton?.removeEventListener("click", openUpgrade);
+            manageBookButton?.removeEventListener("click", openManageBook);
+            manageListButton?.removeEventListener("click", openManageList);
+            manageDBButton?.removeEventListener("click", openManageDB);
+            downloadDBButton?.removeEventListener("click", openDownloadDB);
+            getStartedButton?.removeEventListener("click", scrollToGuides);
+        }
+    }, []);
+
     return (
         <main className={styles.main}>
             <div className={styles.welcomeContainer}>
@@ -20,28 +101,28 @@ export default function Home() {
                 <h1>Track Your Progress</h1>
                 <h4>Manage your personal library efficiently and easily</h4>
                 <span>
-                    <button type="button">Get Started! &rarr;</button>
+                    <button type="button" id="getStartedButton">Get Started! &rarr;</button>
                 </span>
             </div>
-            <div className={styles.guideContainer}>
+            <div ref={guidesRef} className={styles.guideContainer}>
                 <h1>Guides</h1>
                 <div className={styles.guidesContainer}>
-                    <button type="button" className={styles.guideButton}>
+                    <button type="button" id="setupButton" className={styles.guideButton}>
                         Setup
                     </button>
-                    <button type="button" className={styles.guideButton}>
+                    <button type="button" id="upgradeButton" className={styles.guideButton}>
                         Upgrade
                     </button>
-                    <button type="button" className={styles.guideButton}>
+                    <button type="button" id="manageBookButton" className={styles.guideButton}>
                         Manage a Book
                     </button>
-                    <button type="button" className={styles.guideButton}>
+                    <button type="button" id="manageListButton" className={styles.guideButton}>
                         Manage a List
                     </button>
-                    <button type="button" className={styles.guideButton}>
+                    <button type="button" id="manageDBButton" className={styles.guideButton}>
                         Manage Your Database
                     </button>
-                    <button type="button" className={styles.guideButton}>
+                    <button type="button" id="downloadDBButton" className={styles.guideButton}>
                         Download Your Database
                     </button>
                 </div>
