@@ -89,3 +89,16 @@
     width: 72%;
     margin: 0.5rem;
 }
+
+.backmost {
+    z-index: 0;
+}
+
+.modelCover {
+    z-index: 1;
+}
+
+.registerDiv {
+    z-index: 2;
+}
+
