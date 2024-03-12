@@ -1,0 +1,76 @@
+.signupContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100%;
+    overflow: hidden;
+    background-color: rgba(159, 126, 105, 0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.dialog {
+    height: 45%;
+    width: 40%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.xButton {
+    align-self: last baseline;
+}
+
+.inputRow {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.input {
+    appearance: none;
+    outline: none;
+    border: 1px solid gray;
+}
+
+.formInput:invalid {
+    border: 1px solid maroon;
+}
+
+.formInput:valid {
+    border: 1px solid forestgreen;
+}
+
+.formInput:active,
+.formInput:active:focus,
+.formInput:focus:active {
+    border: 3px solid blue;
+}
+
+.formInput:invalid:active,
+.formInput:invalid:active:focus,
+.formInput:invalid:focus:active {
+    border: 3px solid maroon;
+}
+
+.formInput:valid:active,
+.formInput:valid:active:focus,
+.formInput:valid:focus:active {
+    border: 3px solid blue;
+}
+
+.buttonContainer {
+    display: flex;
+    gap: 1rem;
+}
+
