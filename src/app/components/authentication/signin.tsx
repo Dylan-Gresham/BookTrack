@@ -1,19 +1,19 @@
-import { Auth, createUserWithEmailAndPassword } from 'firebase/auth';
-import styles from '../../styles/signup.module.css';
+import { Auth, signInWithEmailAndPassword } from 'firebase/auth';
+import styles from '../../styles/signin.module.css';
 import { useState } from 'react';
 
 export default function Signup(
-    { setRegisterOpen, auth }: {
-        setRegisterOpen: Function,
+    { setLoginOpen, auth }: {
+        setLoginOpen: Function,
         auth: Auth
     }
 ) {
     const [inputs, setInputs] = useState({email: "", password: ""});
 
-    function signUpNewUser(email: string, password: string): boolean {
-        let retVal = false;
+    function loginUser(email: string, password: string): boolean {
+        let retVal = true;
 
-        createUserWithEmailAndPassword(auth, email, password)
+        signInWithEmailAndPassword(auth, email, password)
             .then((userCredentials) => {
                 const user = userCredentials.user;
                 console.log(user);
@@ -23,7 +23,7 @@ export default function Signup(
             .catch((error) => {
                 const errorCode = error.code;
                 const errorMsg = error.message;
-                console.log(`Error creating new user: Error Code = ${errorCode}: ${errorMsg}`);
+                console.log(`Error logging in user: Error Code = ${errorCode}: ${errorMsg}`);
 
                 retVal = false;
             });
@@ -38,7 +38,7 @@ export default function Signup(
                     <p className={styles.xButton} onClick={(e) => {
                         e.preventDefault();
 
-                        setRegisterOpen(false);
+                        setLoginOpen(false);
                     }}>X</p>
                     <div className={styles.inputRow}>
                         <label htmlFor="emailInput" className={styles.inputLabel}>
@@ -76,7 +76,7 @@ export default function Signup(
                          onClick={(e) => {
                                 e.preventDefault();
 
-                                setRegisterOpen(false);
+                                setLoginOpen(false);
                         }}>
                             Cancel
                         </button>
@@ -84,15 +84,15 @@ export default function Signup(
                          onClick={(e) => {
                             e.preventDefault();
 
-                            if(signUpNewUser(inputs.email, inputs.password)) {
-                                console.log("New user added!");
+                            if(loginUser(inputs.email, inputs.password)) {
+                                console.log("Logged in user!");
                             } else {
-                                    console.log("Failed to add new user");
+                                console.log("Failed to log in user");
                             }
 
-                            setRegisterOpen(false);
+                            setLoginOpen(false);
                         }}>
-                            Register!
+                            Log In!
                         </button>
                     </div>
                 </form>
