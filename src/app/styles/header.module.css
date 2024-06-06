@@ -1,22 +1,10 @@
-@media (prefers-color-scheme: light) {
-    .headerContainer {
-        background-color: #263D42;
-    }
-
-    .headerButtonsContainer > button {
-        background-color: #CBC0AE;
-    }
+.headerContainer {
+    background-color: #2E2E3A;
+    color: #F0E5E9;
 }
 
-@media (prefers-color-scheme: dark) {
-    .headerContainer {
-        background-color: #2E2E3A;
-        color: #F0E5E9;
-    }
-
-    .headerButtonsContainer > button {
-        background-color: #CBC0AE;
-    }
+.headerButtonsContainer > button {
+    background-color: #CBC0AE;
 }
 
 .headerContainer {
@@ -36,6 +24,7 @@
 
 .headerContainer > h2 {
     cursor: pointer;
+    font-weight: 600;
 }
 
 .headerButtonsContainer {

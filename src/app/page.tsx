@@ -1,16 +1,26 @@
 'use client';
 
-import styles from "./styles/page.module.css";
-import { Cormorant_Garamond } from "next/font/google";
+// React imports
 import { useState, useEffect, useRef, MutableRefObject } from 'react';
+
+// Style imports
+import { Cormorant_Garamond } from "next/font/google";
+import styles from "./styles/page.module.css";
+
+// Tauri imports
 import { open } from '@tauri-apps/api/shell';
+
+// Firebase imports
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getAuth, User } from 'firebase/auth';
+
+// Component imports
 import Header from './components/header';
 import Footer from './components/footer';
 import Signup from './components/authentication/signup';
 import Signin from './components/authentication/signin';
 
+// Define Firebase config
 const firebaseConfig = {
     apiKey: "AIzaSyBDn6KtWHcjq04dMHyvBhr6kg492EBF4wk",
     authDomain: "booktrack-2d95a.firebaseapp.com",
@@ -20,6 +30,7 @@ const firebaseConfig = {
     appId: "1:117581302631:web:2a7d8523e12b0e186b7dc2"
 };
 
+// Openers
 function openSetup(e: Event) {
     e.preventDefault();
 
@@ -56,14 +67,34 @@ function openDownloadDB(e: Event) {
     open("https://github.com/Dylan-Gresham/BookTrack/blob/nextjs/guides/Download_Your_Database.md");
 }
 
+// Define font
 const garamond500 = Cormorant_Garamond({ subsets: ["latin"], weight: "500" });
 
+// Initialize Firebase app and authentication
 const app = initializeApp(firebaseConfig);
-const auth = getAuth();
+const auth = getAuth(app);
 
+// Home Component
 export default function Home() {
-    const [registerOpen, setRegisterOpen] = useState(false);
-    const [loginOpen, setLoginOpen] = useState(false);
+    const [userInfo, setUserInfo] = useState({
+        registerOpen: false,
+        loginOpen: false,
+        currentUser: auth.currentUser,
+    });
+
+    console.log(userInfo.currentUser);
+
+    function setLoginOpen(value: boolean) {
+        setUserInfo({...userInfo, loginOpen: value});
+    }
+
+    function setRegisterOpen(value: boolean) {
+        setUserInfo({...userInfo, registerOpen: value});
+    }
+
+    function setCurrentUser(user: User | null) {
+        setUserInfo({loginOpen: false, registerOpen: false, currentUser: user});
+    }
 
     const guidesRef = useRef() as MutableRefObject<HTMLDivElement>;
     function scrollToGuides(e: Event) {
@@ -78,19 +109,28 @@ export default function Home() {
     function registerOnClick(e: Event) {
         e.preventDefault();
 
-        setRegisterOpen(!registerOpen);
+        setRegisterOpen(!userInfo.registerOpen);
     }
 
     function loginOnClick(e: Event) {
         e.preventDefault();
 
-        setLoginOpen(!loginOpen);
+        setLoginOpen(!userInfo.loginOpen);
+    }
+
+    function signOutOnClick(e: Event) {
+        e.preventDefault();
+
+        auth.signOut();
+
+        setUserInfo({loginOpen: false, registerOpen: false, currentUser: null});
     }
 
     useEffect(() => {
         // Get all the buttons
         const loginButton = document.getElementById('loginButton');
         const registerButton = document.getElementById('registerButton');
+        const signOutButton = document.getElementById('signOutButton');
         const setupButton = document.getElementById('setupButton');
         const upgradeButton = document.getElementById('upgradeButton');
         const manageBookButton = document.getElementById('manageBookButton');
@@ -102,6 +142,7 @@ export default function Home() {
         // Add the listeners on attach
         loginButton?.addEventListener("click", loginOnClick);
         registerButton?.addEventListener("click", registerOnClick);
+        signOutButton?.addEventListener("click", signOutOnClick);
         setupButton?.addEventListener("click", openSetup);
         upgradeButton?.addEventListener("click", openUpgrade);
         manageBookButton?.addEventListener("click", openManageBook);
@@ -114,6 +155,7 @@ export default function Home() {
             // Remove the listeners on detach
             loginButton?.removeEventListener("click", loginOnClick);
             registerButton?.removeEventListener("click", registerOnClick);
+            signOutButton?.removeEventListener("click", signOutOnClick);
             setupButton?.removeEventListener("click", openSetup);
             upgradeButton?.removeEventListener("click", openUpgrade);
             manageBookButton?.removeEventListener("click", openManageBook);
@@ -126,15 +168,16 @@ export default function Home() {
 
     return (
         <>
-            <Header currentUser={auth.currentUser}/>
+            <Header currentUser={userInfo.currentUser}/>
             <main className={styles.main}>
-                {registerOpen && <Signup
+                {userInfo.registerOpen === true && userInfo.currentUser === null && <Signup
                     setRegisterOpen={setRegisterOpen}
                     auth={auth}
                 />}
-                {loginOpen && <Signin
+                {userInfo.loginOpen === true && userInfo.currentUser === null  && <Signin
                     setLoginOpen={setLoginOpen}
                     auth={auth}
+                    setCurrentUser={setCurrentUser}
                 />}
                 <div className={styles.welcomeContainer}>
                     <h1>Welcome to BookTrack!</h1>
@@ -155,6 +198,7 @@ export default function Home() {
                 </div>
                 <div ref={guidesRef} className={styles.guideContainer}>
                     <h1>Guides</h1>
+                    <p>Visit these guides to learn more about the various capabilities of BookTrack!</p>
                     <div className={styles.guidesContainer}>
                         <button type="button" id="setupButton" className={styles.guideButton}>
                             Setup

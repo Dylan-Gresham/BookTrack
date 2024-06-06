@@ -1,7 +1,12 @@
 import { User } from 'firebase/auth';
 import styles from '../styles/header.module.css';
 
-export default function Header({currentUser}: {currentUser: User | null}) {
+export default function Header(
+    {currentUser,}:
+    {
+        currentUser: User | null,
+    }
+) {
     if(currentUser !== null) {
         return (
             <header className={styles.headerContainer}>

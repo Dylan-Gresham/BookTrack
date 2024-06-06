@@ -1,34 +1,33 @@
-import { Auth, signInWithEmailAndPassword } from 'firebase/auth';
+import { Auth, User, signInWithEmailAndPassword } from 'firebase/auth';
 import styles from '../../styles/signin.module.css';
 import { useState } from 'react';
 
 export default function Signup(
-    { setLoginOpen, auth }: {
+    { setLoginOpen, auth, setCurrentUser }: {
         setLoginOpen: Function,
-        auth: Auth
+        auth: Auth,
+        setCurrentUser: Function,
     }
 ) {
     const [inputs, setInputs] = useState({email: "", password: ""});
 
-    function loginUser(email: string, password: string): boolean {
-        let retVal = true;
-
-        signInWithEmailAndPassword(auth, email, password)
+    function loginUser(email: string, password: string): Promise<User | null> {
+        let user = signInWithEmailAndPassword(auth, email, password)
             .then((userCredentials) => {
-                const user = userCredentials.user;
-                console.log(user);
+                const u = userCredentials.user;
+                console.log(u);
 
-                retVal = true;
+                return u;
             })
             .catch((error) => {
                 const errorCode = error.code;
                 const errorMsg = error.message;
                 console.log(`Error logging in user: Error Code = ${errorCode}: ${errorMsg}`);
 
-                retVal = false;
+                return null;
             });
 
-        return retVal;
+        return user;
     }
 
     return (
@@ -81,16 +80,20 @@ export default function Signup(
                             Cancel
                         </button>
                         <button type="submit" className={styles.formButton}
-                         onClick={(e) => {
+                         onClick={async (e) => {
                             e.preventDefault();
 
-                            if(loginUser(inputs.email, inputs.password)) {
+                            let user = await loginUser(inputs.email, inputs.password);
+
+                            console.log(user);
+
+                            if(user) {
                                 console.log("Logged in user!");
+                                setCurrentUser(user)
                             } else {
                                 console.log("Failed to log in user");
+                                setCurrentUser(user);
                             }
-
-                            setLoginOpen(false);
                         }}>
                             Log In!
                         </button>
