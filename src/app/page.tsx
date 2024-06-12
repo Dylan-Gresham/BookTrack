@@ -12,7 +12,7 @@ import { open } from '@tauri-apps/api/shell';
 
 // Firebase imports
 import { initializeApp } from 'firebase/app';
-import { getAuth, User } from 'firebase/auth';
+import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 
 // Component imports
 import Header from './components/header';
@@ -82,6 +82,16 @@ export default function Home() {
         currentUser: auth.currentUser,
     });
 
+    useEffect( () => {
+        onAuthStateChanged(auth, (user) => {
+            if(user) {
+                setUserInfo({...userInfo, registerOpen: false, loginOpen: false, currentUser: user});
+            } else {
+                setUserInfo({...userInfo, registerOpen: false, loginOpen: false, currentUser: null});
+            }
+        });
+    }, []);
+
     console.log(userInfo.currentUser);
 
     function setLoginOpen(value: boolean) {
@@ -122,8 +132,6 @@ export default function Home() {
         e.preventDefault();
 
         auth.signOut();
-
-        setUserInfo({loginOpen: false, registerOpen: false, currentUser: null});
     }
 
     useEffect(() => {
