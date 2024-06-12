@@ -83,6 +83,8 @@ export default function Home() {
     });
 
     useEffect( () => {
+        (async () => {await auth.signOut();})();
+
         onAuthStateChanged(auth, (user) => {
             if(user) {
                 setUserInfo({...userInfo, registerOpen: false, loginOpen: false, currentUser: user});
