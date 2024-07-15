@@ -1,113 +1,24 @@
 'use client';
 
 // React imports
-import { useState, useEffect, useRef, MutableRefObject } from 'react';
+import { useEffect, useRef, MutableRefObject } from 'react';
 
 // Style imports
 import { Cormorant_Garamond } from "next/font/google";
 import styles from "./styles/page.module.css";
 
-// Tauri imports
-import { open } from '@tauri-apps/api/shell';
-
-// Firebase imports
-import { initializeApp } from 'firebase/app';
-import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
-
 // Component imports
 import Header from './components/header';
 import Footer from './components/footer';
-import Signup from './components/authentication/signup';
-import Signin from './components/authentication/signin';
 
-// Define Firebase config
-const firebaseConfig = {
-    apiKey: "AIzaSyBDn6KtWHcjq04dMHyvBhr6kg492EBF4wk",
-    authDomain: "booktrack-2d95a.firebaseapp.com",
-    projectId: "booktrack-2d95a",
-    storageBucket: "booktrack-2d95a.appspot.com",
-    messagingSenderId: "117581302631",
-    appId: "1:117581302631:web:2a7d8523e12b0e186b7dc2"
-};
-
-// Openers
-function openSetup(e: Event) {
-    e.preventDefault();
-
-    open("https://github.com/Dylan-Gresham/BookTrack/blob/nextjs/guides/Setup.md");
-}
-
-function openUpgrade(e: Event) {
-    e.preventDefault();
-
-    open("https://github.com/Dylan-Gresham/BookTrack/blob/nextjs/guides/Upgrade.md");
-}
-
-function openManageBook(e: Event) {
-    e.preventDefault();
-
-    open("https://github.com/Dylan-Gresham/BookTrack/blob/nextjs/guides/Managing_a_Book.md");
-}
-
-function openManageList(e: Event) {
-    e.preventDefault();
-
-    open("https://github.com/Dylan-Gresham/BookTrack/blob/nextjs/guides/Manage_a_List.md");
-}
-
-function openManageDB(e: Event) {
-    e.preventDefault();
-
-    open("https://github.com/Dylan-Gresham/BookTrack/blob/nextjs/guides/Manage_Your_Database.md");
-}
-
-function openDownloadDB(e: Event) {
-    e.preventDefault();
-
-    open("https://github.com/Dylan-Gresham/BookTrack/blob/nextjs/guides/Download_Your_Database.md");
-}
+// Library imports
+import { openDownloadDB, openManageBook, openManageDB, openManageList, openSetup, openUpgrade } from './lib/openers';
 
 // Define font
 const garamond500 = Cormorant_Garamond({ subsets: ["latin"], weight: "500" });
 
-// Initialize Firebase app and authentication
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-
 // Home Component
 export default function Home() {
-    const [userInfo, setUserInfo] = useState({
-        registerOpen: false,
-        loginOpen: false,
-        currentUser: auth.currentUser,
-    });
-
-    useEffect( () => {
-        (async () => {await auth.signOut();})();
-
-        onAuthStateChanged(auth, (user) => {
-            if(user) {
-                setUserInfo({...userInfo, registerOpen: false, loginOpen: false, currentUser: user});
-            } else {
-                setUserInfo({...userInfo, registerOpen: false, loginOpen: false, currentUser: null});
-            }
-        });
-    }, []);
-
-    console.log(userInfo.currentUser);
-
-    function setLoginOpen(value: boolean) {
-        setUserInfo({...userInfo, loginOpen: value});
-    }
-
-    function setRegisterOpen(value: boolean) {
-        setUserInfo({...userInfo, registerOpen: value});
-    }
-
-    function setCurrentUser(user: User | null) {
-        setUserInfo({loginOpen: false, registerOpen: false, currentUser: user});
-    }
-
     const guidesRef = useRef() as MutableRefObject<HTMLDivElement>;
     function scrollToGuides(e: Event) {
         e.preventDefault();
@@ -118,29 +29,8 @@ export default function Home() {
         })
     }
 
-    function registerOnClick(e: Event) {
-        e.preventDefault();
-
-        setRegisterOpen(!userInfo.registerOpen);
-    }
-
-    function loginOnClick(e: Event) {
-        e.preventDefault();
-
-        setLoginOpen(!userInfo.loginOpen);
-    }
-
-    function signOutOnClick(e: Event) {
-        e.preventDefault();
-
-        auth.signOut();
-    }
-
     useEffect(() => {
         // Get all the buttons
-        const loginButton = document.getElementById('loginButton');
-        const registerButton = document.getElementById('registerButton');
-        const signOutButton = document.getElementById('signOutButton');
         const setupButton = document.getElementById('setupButton');
         const upgradeButton = document.getElementById('upgradeButton');
         const manageBookButton = document.getElementById('manageBookButton');
@@ -150,9 +40,6 @@ export default function Home() {
         const getStartedButton = document.getElementById('getStartedButton');
 
         // Add the listeners on attach
-        loginButton?.addEventListener("click", loginOnClick);
-        registerButton?.addEventListener("click", registerOnClick);
-        signOutButton?.addEventListener("click", signOutOnClick);
         setupButton?.addEventListener("click", openSetup);
         upgradeButton?.addEventListener("click", openUpgrade);
         manageBookButton?.addEventListener("click", openManageBook);
@@ -163,9 +50,6 @@ export default function Home() {
 
         return () => {
             // Remove the listeners on detach
-            loginButton?.removeEventListener("click", loginOnClick);
-            registerButton?.removeEventListener("click", registerOnClick);
-            signOutButton?.removeEventListener("click", signOutOnClick);
             setupButton?.removeEventListener("click", openSetup);
             upgradeButton?.removeEventListener("click", openUpgrade);
             manageBookButton?.removeEventListener("click", openManageBook);
@@ -178,17 +62,8 @@ export default function Home() {
 
     return (
         <>
-            <Header currentUser={userInfo.currentUser}/>
+            <Header currentUser={null}/>
             <main className={styles.main}>
-                {userInfo.registerOpen === true && userInfo.currentUser === null && <Signup
-                    setRegisterOpen={setRegisterOpen}
-                    auth={auth}
-                />}
-                {userInfo.loginOpen === true && userInfo.currentUser === null  && <Signin
-                    setLoginOpen={setLoginOpen}
-                    auth={auth}
-                    setCurrentUser={setCurrentUser}
-                />}
                 <div className={styles.welcomeContainer}>
                     <h1>Welcome to BookTrack!</h1>
                     <p className={garamond500.className}>BookTrack is a
