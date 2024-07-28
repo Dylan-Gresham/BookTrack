@@ -2,19 +2,53 @@ use std::fs;
 
 use dirs;
 use indoc::indoc;
+use serde_json;
+use serde::{Serialize, Deserialize};
 
 pub static CONFIG_FILE: &'static str = "/config.json";
 pub static CONFIG_DIR: &'static str = "/booktrack";
 pub static DEFAULT_CONFIG: &'static str = indoc! {r#"
 {
     "username": "",
-    "dbDetails": {
-        "name": "",
-        "url": ""
-    },
-    "theme": ""
+    "db_name": "",
+    "db_url": "",
+    "db_token": "",
+    "theme": "default"
 }
 "#};
+
+#[derive(Serialize, Deserialize)]
+pub struct Config {
+    pub username: String,
+    pub db_name: String,
+    pub db_url: String,
+    pub db_token: String,
+    pub theme: String,
+}
+
+impl Config {
+    pub fn from_config_file() -> Config {
+        match read_config() {
+            Ok(config_string) => {
+                match serde_json::from_str(&config_string) {
+                    Ok(config) => config,
+                    Err(_) => Config::default_config(),
+                }
+            }
+            Err(_) => Config::default_config(),
+        }
+    }
+
+    pub fn default_config() -> Config {
+        Config {
+            username: "".into(),
+            db_name: "".into(),
+            db_url: "".into(),
+            db_token: "".into(),
+            theme: "default".into(),
+        }
+    }
+}
 
 /// ## read_config
 ///

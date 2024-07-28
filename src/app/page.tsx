@@ -3,6 +3,9 @@
 // React imports
 import { useEffect, useRef, MutableRefObject } from 'react';
 
+// Tauri imports
+import { invoke } from '@tauri-apps/api/tauri';
+
 // Style imports
 import { Cormorant_Garamond } from "next/font/google";
 import styles from "./styles/page.module.css";
@@ -73,6 +76,21 @@ export default function Home() {
                         simple to organize your library, set personal goals,
                         and stay motivated!
                     </p>
+                    <button type="button" onClick={ async (e: any) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        let books: {
+                            title: string,
+                            author: string,
+                            page_count: number,
+                            pages_read: number,
+                            image: string,
+                        }[] = await invoke('get_all_books');
+                        books.map( (book) => console.log(book));
+                    }}>
+                        Testing DB Button
+                    </button>
                 </div>
                 <div className={styles.typContainer}>
                     <h1>Track Your Progress</h1>
