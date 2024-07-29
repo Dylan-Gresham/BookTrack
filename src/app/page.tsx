@@ -63,6 +63,39 @@ export default function Home() {
         }
     }, []);
 
+    interface Config {
+        username: string;
+        db_name: string;
+        db_url: string;
+        db_token: string;
+        theme: string;
+    }
+
+    function instanceOfConfig(object: any): object is Config {
+        if(object.username !== undefined && object.db_name !== undefined
+           && object.db_url !== undefined && object.db_token !== undefined
+           && object.theme !== undefined) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    async function configCheck(config: any): Promise<null> {
+        if(instanceOfConfig(config)) {
+            // Set state stuff
+
+            // Invoke window change
+            invoke('close_splashscreen');
+        } else {
+            return await invoke('get_config').then(configCheck);
+        }
+
+        return null;
+    }
+
+    invoke('get_config').then(async (c) => await configCheck(c));
+
     return (
         <>
             <Header currentUser={null}/>

@@ -3,6 +3,9 @@
 
 mod config;
 
+use config::Config;
+use tauri::{Manager, Window};
+
 use libsql::{Builder, Connection};
 use serde::{Deserialize, Serialize};
 
@@ -28,6 +31,11 @@ pub struct DBItem {
     total_pages: u32,
     pages_read: u32,
     image: String,
+}
+
+#[tauri::command]
+fn get_config() -> Config {
+    config::Config::from_config_file()
 }
 
 async fn get_db_connection() -> Result<Connection> {
@@ -77,12 +85,20 @@ async fn get_all_books() -> Result<Vec<DBItem>> {
     Ok(books)
 }
 
+#[tauri::command]
+async fn close_splashscreen(window: Window) {
+    window.get_window("splashscreen").expect("No window labeled 'splashscreen' found").close().unwrap();
+    window.get_window("main").expect("No window labeled 'main' found").show().unwrap();
+}
+
 fn main() {
     tracing_subscriber::fmt::init();
 
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             get_all_books,
+            close_splashscreen,
+            get_config,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
