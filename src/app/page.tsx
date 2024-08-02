@@ -81,21 +81,6 @@ export default function Home() {
         }
     }
 
-    async function configCheck(config: any): Promise<null> {
-        if(instanceOfConfig(config)) {
-            // Set state stuff
-
-            // Invoke window change
-            invoke('close_splashscreen');
-        } else {
-            return await invoke('get_config').then(configCheck);
-        }
-
-        return null;
-    }
-
-    invoke('get_config').then(async (c) => await configCheck(c));
-
     return (
         <>
             <Header currentUser={null}/>

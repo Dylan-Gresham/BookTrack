@@ -4,7 +4,7 @@
 mod config;
 
 use config::Config;
-use tauri::{Manager, Window};
+use tauri::Manager;
 
 use libsql::{Builder, Connection};
 use serde::{Deserialize, Serialize};
@@ -85,19 +85,39 @@ async fn get_all_books() -> Result<Vec<DBItem>> {
     Ok(books)
 }
 
-#[tauri::command]
-async fn close_splashscreen(window: Window) {
-    window.get_window("splashscreen").expect("No window labeled 'splashscreen' found").close().unwrap();
-    window.get_window("main").expect("No window labeled 'main' found").show().unwrap();
-}
-
 fn main() {
     tracing_subscriber::fmt::init();
 
     tauri::Builder::default()
+        .setup(|app| {
+            let splashscreen_window = app.get_window("splashscreen").expect("No window labeled 'splashscreen' found");
+            let main_window = app.get_window("main").expect("No window labeled 'main' found");
+
+            // Perform initialization on a new task so app doesn't freeze
+            tauri::async_runtime::spawn(async move {
+                println!("Initializing...");
+
+                match get_all_books().await {
+                    Ok(books) => {
+                        println!("Books:");
+                        for book in books {
+                            println!("\t{:?}", book);
+                        }
+                    }
+                    Err(_) => println!("Unable to get books"),
+                }
+
+                println!("Done initializing!");
+
+                // Close splashscreen and show main window
+                splashscreen_window.close().unwrap();
+                main_window.show().unwrap();
+            });
+
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             get_all_books,
-            close_splashscreen,
             get_config,
         ])
         .run(tauri::generate_context!())
