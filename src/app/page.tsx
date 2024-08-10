@@ -1,7 +1,7 @@
 'use client';
 
 // React imports
-import { useEffect, useRef, MutableRefObject } from 'react';
+import { useEffect, useRef, MutableRefObject, useState } from 'react';
 
 // Tauri imports
 import { invoke } from '@tauri-apps/api/tauri';
@@ -12,7 +12,6 @@ import styles from "./styles/page.module.css";
 
 // Component imports
 import Header from './components/header';
-import Footer from './components/footer';
 
 // Library imports
 import { openDownloadDB, openManageBook, openManageDB, openManageList, openSetup, openUpgrade } from './lib/openers';
@@ -63,23 +62,23 @@ export default function Home() {
         }
     }, []);
 
-    interface Config {
-        username: string;
-        db_name: string;
-        db_url: string;
-        db_token: string;
-        theme: string;
-    }
+    // interface Config {
+    //     username: string;
+    //     db_name: string;
+    //     db_url: string;
+    //     db_token: string;
+    //     theme: string;
+    // }
 
-    function instanceOfConfig(object: any): object is Config {
-        if(object.username !== undefined && object.db_name !== undefined
-           && object.db_url !== undefined && object.db_token !== undefined
-           && object.theme !== undefined) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+    // function instanceOfConfig(object: any): object is Config {
+    //     if(object.username !== undefined && object.db_name !== undefined
+    //        && object.db_url !== undefined && object.db_token !== undefined
+    //        && object.theme !== undefined) {
+    //         return true;
+    //     } else {
+    //         return false;
+    //     }
+    // }
 
     return (
         <>
@@ -187,7 +186,6 @@ export default function Home() {
                     </button>
                 </div>
             </main>
-            <Footer />
         </>
     );
 }

@@ -1,13 +1,10 @@
-import { User } from 'firebase/auth';
+import Link from 'next/link';
 import styles from '../styles/header.module.css';
-
-function createAccount() {
-}
 
 export default function Header(
     {currentUser,}:
     {
-        currentUser: User | null,
+        currentUser: string | null,
     }
 ) {
     if(currentUser !== null) {
@@ -15,7 +12,7 @@ export default function Header(
             <header className={styles.headerContainer}>
                 <h2>BookTrack</h2>
                 <div className={styles.headerButtonsContainer}>
-                    <p>FILL USERNAME HERE</p>
+                    <p>{currentUser}</p>
                 </div>
             </header>
         );
@@ -24,14 +21,7 @@ export default function Header(
             <header className={styles.headerContainer}>
                 <h2>BookTrack</h2>
                 <div className={styles.headerButtonsContainer}>
-                    <button type='button' onClick={ (event: React.MouseEvent<HTMLElement>) => {
-                        event.preventDefault();
-                        event.stopPropagation();
-
-                        // Logic for controlling all the screen changes for account creation.
-                        // Another modal then update config file?
-                        console.log("Create Account TODO!");
-                    }}>Create Account</button>
+                    <Link href="/create-account">Create Account</Link>
                 </div>
             </header>
         );
