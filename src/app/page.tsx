@@ -1,7 +1,7 @@
 'use client';
 
 // React imports
-import { useRef, MutableRefObject, useContext } from 'react';
+import { useRef, MutableRefObject, useContext, useState } from 'react';
 
 // Tauri imports
 import { invoke } from '@tauri-apps/api/tauri';
@@ -15,14 +15,17 @@ import Header from './components/header';
 
 // Library imports
 import { openDownloadDB, openManageBook, openManageDB, openManageList, openSetup, openUpgrade } from './lib/openers';
-import { UserContext } from './context/UserContext';
+import { UserContext, UserContextType } from './context/UserContext';
 
 // Define font
 const garamond500 = Cormorant_Garamond({ subsets: ["latin"], weight: "500" });
 
 // Home Component
 export default function Home() {
-    const userContext = useContext(UserContext);
+    const [user, setUser] = useState<UserContextType>({
+        user: null,
+        updateUser: (user: string | null) => setUser({ user }),
+    });
     const guidesRef = useRef() as MutableRefObject<HTMLDivElement>;
     function scrollToGuides(e: React.MouseEvent<HTMLButtonElement>) {
         e.preventDefault();
@@ -35,7 +38,9 @@ export default function Home() {
 
     return (
         <>
-            <Header user={userContext.user}/>
+            <UserContext.Provider value={user}>
+                <Header user={user}/>
+            </UserContext.Provider>
             <main className={styles.main}>
                 <div className={styles.welcomeContainer}>
                     <h1>Welcome to BookTrack!</h1>

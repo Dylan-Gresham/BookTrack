@@ -1,7 +1,11 @@
 import { createContext } from "react";
 
-let defaultContext: { user: string | null } = {
-    user: null
-};
+export interface UserContextType {
+    user: string | null;
+    updateUser: (user: string | null) => void;
+}
 
-export const UserContext = createContext(defaultContext);
+export const UserContext = createContext<UserContextType | null>({
+    user: null,
+    updateUser: () => {},
+});
