@@ -1,18 +1,21 @@
+// NextJS imports
 import Link from 'next/link';
+
+// CSS import
 import styles from '../styles/header.module.css';
 
 export default function Header(
-    {currentUser,}:
+    {user}:
     {
-        currentUser: string | null,
+        user: string | null,
     }
 ) {
-    if(currentUser !== null) {
+    if(user !== null) {
         return (
             <header className={styles.headerContainer}>
                 <h2>BookTrack</h2>
                 <div className={styles.headerButtonsContainer}>
-                    <p>{currentUser}</p>
+                    <p>{user}</p>
                 </div>
             </header>
         );

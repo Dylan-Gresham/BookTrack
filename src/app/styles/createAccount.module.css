@@ -1,0 +1,84 @@
+.container {
+    width: 50%;
+    height: 60%;
+    margin: auto;
+    background-color: #CBC0AE;
+}
+
+.title {
+    margin-left: 0.5rem;
+    margin-bottom: 1.5rem;
+    font-weight: normal;
+}
+
+.container > form {
+    height: 80%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.formGroup {
+    width: 75%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.formGroup > div > .label {
+    font-weight: normal;
+    display: flex;
+    align-items: center;
+}
+
+.formGroup > div {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.label,
+.radioInput,
+.textInput {
+    cursor: pointer;
+}
+
+.radioInput,
+.textInput {
+    appearance: none;
+}
+
+.textInput {
+    border: 1px solid black;
+    border-radius: 6px;
+    padding: 0.5rem;
+    font-size: 1.25rem;
+    color: white;
+    background-color: #5D707F;
+}
+
+.radioInput {
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    border: 2px solid black;
+    transition: 0.2s all linear;
+}
+
+.radioInput:checked {
+    border: 6px solid #5D707F;
+}
+
+.formButtons {
+    margin-top: auto;
+    display: flex;
+    gap: 3rem;
+}
+
+.formButtons button {
+    padding: 0.1rem;
+    background-color: #5D707F;
+}
+
