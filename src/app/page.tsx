@@ -1,7 +1,7 @@
 'use client';
 
 // React imports
-import { useEffect, useRef, MutableRefObject, useContext } from 'react';
+import { useRef, MutableRefObject, useContext } from 'react';
 
 // Tauri imports
 import { invoke } from '@tauri-apps/api/tauri';
@@ -24,7 +24,7 @@ const garamond500 = Cormorant_Garamond({ subsets: ["latin"], weight: "500" });
 export default function Home() {
     const userContext = useContext(UserContext);
     const guidesRef = useRef() as MutableRefObject<HTMLDivElement>;
-    function scrollToGuides(e: Event) {
+    function scrollToGuides(e: React.MouseEvent<HTMLButtonElement>) {
         e.preventDefault();
 
         window.scrollTo({
@@ -32,37 +32,6 @@ export default function Home() {
             behavior: "smooth"
         })
     }
-
-    useEffect(() => {
-        // Get all the buttons
-        const setupButton = document.getElementById('setupButton');
-        const upgradeButton = document.getElementById('upgradeButton');
-        const manageBookButton = document.getElementById('manageBookButton');
-        const manageListButton = document.getElementById('manageListButton');
-        const manageDBButton = document.getElementById('manageDBButton');
-        const downloadDBButton = document.getElementById('downloadDBButton');
-        const getStartedButton = document.getElementById('getStartedButton');
-
-        // Add the listeners on attach
-        setupButton?.addEventListener("click", openSetup);
-        upgradeButton?.addEventListener("click", openUpgrade);
-        manageBookButton?.addEventListener("click", openManageBook);
-        manageListButton?.addEventListener("click", openManageList);
-        manageDBButton?.addEventListener("click", openManageDB);
-        downloadDBButton?.addEventListener("click", openDownloadDB);
-        getStartedButton?.addEventListener("click", scrollToGuides);
-
-        return () => {
-            // Remove the listeners on detach
-            setupButton?.removeEventListener("click", openSetup);
-            upgradeButton?.removeEventListener("click", openUpgrade);
-            manageBookButton?.removeEventListener("click", openManageBook);
-            manageListButton?.removeEventListener("click", openManageList);
-            manageDBButton?.removeEventListener("click", openManageDB);
-            downloadDBButton?.removeEventListener("click", openDownloadDB);
-            getStartedButton?.removeEventListener("click", scrollToGuides);
-        }
-    }, []);
 
     return (
         <>
@@ -97,29 +66,59 @@ export default function Home() {
                     <h1>Track Your Progress</h1>
                     <h4>Manage your personal library efficiently and easily</h4>
                     <span>
-                        <button type="button" id="getStartedButton">Get Started! &rarr;</button>
+                        <button type="button" id="getStartedButton" onClick={scrollToGuides}>Get Started! &rarr;</button>
                     </span>
                 </div>
                 <div ref={guidesRef} className={styles.guideContainer}>
                     <h1>Guides</h1>
                     <p>Visit these guides to learn more about the various capabilities of BookTrack!</p>
                     <div className={styles.guidesContainer}>
-                        <button type="button" id="setupButton" className={styles.guideButton}>
+                        <button
+                            type="button"
+                            id="setupButton"
+                            className={styles.guideButton}
+                            onClick={openSetup}
+                        >
                             Setup
                         </button>
-                        <button type="button" id="upgradeButton" className={styles.guideButton}>
+                        <button
+                            type="button"
+                            id="upgradeButton"
+                            className={styles.guideButton}
+                            onClick={openUpgrade}
+                        >
                             Upgrade
                         </button>
-                        <button type="button" id="manageBookButton" className={styles.guideButton}>
+                        <button
+                            type="button"
+                            id="manageBookButton"
+                            className={styles.guideButton}
+                            onClick={openManageBook}
+                        >
                             Manage a Book
                         </button>
-                        <button type="button" id="manageListButton" className={styles.guideButton}>
+                        <button
+                            type="button"
+                            id="manageListButton"
+                            className={styles.guideButton}
+                            onClick={openManageList}
+                        >
                             Manage a List
                         </button>
-                        <button type="button" id="manageDBButton" className={styles.guideButton}>
+                        <button
+                            type="button"
+                            id="manageDBButton"
+                            className={styles.guideButton}
+                            onClick={openManageDB}
+                        >
                             Manage Your Database
                         </button>
-                        <button type="button" id="downloadDBButton" className={styles.guideButton}>
+                        <button
+                            type="button"
+                            id="downloadDBButton"
+                            className={styles.guideButton}
+                            onClick={openDownloadDB}
+                        >
                             Download Your Database
                         </button>
                     </div>
