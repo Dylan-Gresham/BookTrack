@@ -1,179 +1,190 @@
-'use client';
+"use client";
 
 // React imports
-import { useRef, MutableRefObject, useContext, useState } from 'react';
+import { useRef, MutableRefObject } from "react";
 
 // Tauri imports
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from "@tauri-apps/api/tauri";
 
 // Style imports
 import { Cormorant_Garamond } from "next/font/google";
 import styles from "./styles/page.module.css";
 
 // Component imports
-import Header from './components/header';
+import Header from "./components/header";
 
 // Library imports
-import { openDownloadDB, openManageBook, openManageDB, openManageList, openSetup, openUpgrade } from './lib/openers';
-import { UserContext, UserContextType } from './context/UserContext';
+import {
+  openDownloadDB,
+  openManageBook,
+  openManageDB,
+  openManageList,
+  openSetup,
+  openUpgrade,
+} from "./lib/openers";
 
 // Define font
 const garamond500 = Cormorant_Garamond({ subsets: ["latin"], weight: "500" });
 
 // Home Component
 export default function Home() {
-    const [user, setUser] = useState<UserContextType>({
-        user: null,
-        updateUser: (user: string | null) => setUser({ user }),
+  const guidesRef = useRef() as MutableRefObject<HTMLDivElement>;
+  function scrollToGuides(e: React.MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
+
+    window.scrollTo({
+      top: guidesRef.current.offsetTop,
+      behavior: "smooth",
     });
-    const guidesRef = useRef() as MutableRefObject<HTMLDivElement>;
-    function scrollToGuides(e: React.MouseEvent<HTMLButtonElement>) {
-        e.preventDefault();
+  }
 
-        window.scrollTo({
-            top: guidesRef.current.offsetTop,
-            behavior: "smooth"
-        })
-    }
+  return (
+    <>
+      <Header />
+      <main className={styles.main}>
+        <div className={styles.welcomeContainer}>
+          <h1>Welcome to BookTrack!</h1>
+          <p className={garamond500.className}>
+            BookTrack is a user-friendly application designed to help you easily
+            keep track of your reading. Regardless of what type of reader you
+            are, this app makes it simple to organize your library, set personal
+            goals, and stay motivated!
+          </p>
+          <button
+            type="button"
+            onClick={async (e: any) => {
+              e.preventDefault();
+              e.stopPropagation();
 
-    return (
-        <>
-            <UserContext.Provider value={user}>
-                <Header user={user}/>
-            </UserContext.Provider>
-            <main className={styles.main}>
-                <div className={styles.welcomeContainer}>
-                    <h1>Welcome to BookTrack!</h1>
-                    <p className={garamond500.className}>BookTrack is a
-                        user-friendly application designed to help you
-                        easily keep track of your reading. Regardless of
-                        what type of reader you are, this app makes it
-                        simple to organize your library, set personal goals,
-                        and stay motivated!
-                    </p>
-                    <button type="button" onClick={ async (e: any) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-
-                        let books: {
-                            title: string,
-                            author: string,
-                            page_count: number,
-                            pages_read: number,
-                            image: string,
-                        }[] = await invoke('get_all_books');
-                        books.map( (book) => console.log(book));
-                    }}>
-                        Testing DB Button
-                    </button>
-                </div>
-                <div className={styles.typContainer}>
-                    <h1>Track Your Progress</h1>
-                    <h4>Manage your personal library efficiently and easily</h4>
-                    <span>
-                        <button type="button" id="getStartedButton" onClick={scrollToGuides}>Get Started! &rarr;</button>
-                    </span>
-                </div>
-                <div ref={guidesRef} className={styles.guideContainer}>
-                    <h1>Guides</h1>
-                    <p>Visit these guides to learn more about the various capabilities of BookTrack!</p>
-                    <div className={styles.guidesContainer}>
-                        <button
-                            type="button"
-                            id="setupButton"
-                            className={styles.guideButton}
-                            onClick={openSetup}
-                        >
-                            Setup
-                        </button>
-                        <button
-                            type="button"
-                            id="upgradeButton"
-                            className={styles.guideButton}
-                            onClick={openUpgrade}
-                        >
-                            Upgrade
-                        </button>
-                        <button
-                            type="button"
-                            id="manageBookButton"
-                            className={styles.guideButton}
-                            onClick={openManageBook}
-                        >
-                            Manage a Book
-                        </button>
-                        <button
-                            type="button"
-                            id="manageListButton"
-                            className={styles.guideButton}
-                            onClick={openManageList}
-                        >
-                            Manage a List
-                        </button>
-                        <button
-                            type="button"
-                            id="manageDBButton"
-                            className={styles.guideButton}
-                            onClick={openManageDB}
-                        >
-                            Manage Your Database
-                        </button>
-                        <button
-                            type="button"
-                            id="downloadDBButton"
-                            className={styles.guideButton}
-                            onClick={openDownloadDB}
-                        >
-                            Download Your Database
-                        </button>
-                    </div>
-                </div>
-                <div className={styles.featuresContainer}>
-                    <h1>Features</h1>
-                    <h4>Discover how BookTrack can benefit your library.</h4>
-                    <div className={styles.featureButtons}>
-                        <button type="button" className={styles.featureButton}>
-                            <h3>Book Search</h3>
-                            <p className={garamond500.className}>
-                                Easily find a book you've already got in
-                                your list or find books to add to your list!
-                            </p>
-                        </button>
-                        <button type="button" className={styles.featureButton}>
-                            <h3>Reading Progress</h3>
-                            <p className={garamond500.className}>
-                                Track your current progress for each book
-                                with both percentage completion and page counts!
-                            </p>
-                        </button>
-                        <button type="button" className={styles.featureButton}>
-                            <h3>Custom Lists</h3>
-                            <p className={garamond500.className}>
-                                Create your own lists of books on top of
-                                the default lists we provide for you
-                            </p>
-                        </button>
-                        <button type="button" className={styles.featureButton}>
-                            <h3>Set and Track Goals</h3>
-                            <p className={garamond500.className}>
-                                Set personal goals and choose to have
-                                reminders sent to you regularly.
-                            </p>
-                        </button>
-                    </div>
-                    <button type="button" className={styles.dbButton}>
-                        <h3>Database Management</h3>
-                        <p className={garamond500.className}>
-                            Your own personal database that you can manage
-                            and have complete control over!
-                        </p>
-                        <p className={garamond500.className}>
-                            Learn more about Turso
-                            <a className={garamond500.className}> here!</a>
-                        </p>
-                    </button>
-                </div>
-            </main>
-        </>
-    );
+              let books: {
+                title: string;
+                author: string;
+                page_count: number;
+                pages_read: number;
+                image: string;
+              }[] = await invoke("get_all_books");
+              books.map((book) => console.log(book));
+            }}
+          >
+            Testing DB Button
+          </button>
+        </div>
+        <div className={styles.typContainer}>
+          <h1>Track Your Progress</h1>
+          <h4>Manage your personal library efficiently and easily</h4>
+          <span>
+            <button
+              type="button"
+              id="getStartedButton"
+              onClick={scrollToGuides}
+            >
+              Get Started! &rarr;
+            </button>
+          </span>
+        </div>
+        <div ref={guidesRef} className={styles.guideContainer}>
+          <h1>Guides</h1>
+          <p>
+            Visit these guides to learn more about the various capabilities of
+            BookTrack!
+          </p>
+          <div className={styles.guidesContainer}>
+            <button
+              type="button"
+              id="setupButton"
+              className={styles.guideButton}
+              onClick={openSetup}
+            >
+              Setup
+            </button>
+            <button
+              type="button"
+              id="upgradeButton"
+              className={styles.guideButton}
+              onClick={openUpgrade}
+            >
+              Upgrade
+            </button>
+            <button
+              type="button"
+              id="manageBookButton"
+              className={styles.guideButton}
+              onClick={openManageBook}
+            >
+              Manage a Book
+            </button>
+            <button
+              type="button"
+              id="manageListButton"
+              className={styles.guideButton}
+              onClick={openManageList}
+            >
+              Manage a List
+            </button>
+            <button
+              type="button"
+              id="manageDBButton"
+              className={styles.guideButton}
+              onClick={openManageDB}
+            >
+              Manage Your Database
+            </button>
+            <button
+              type="button"
+              id="downloadDBButton"
+              className={styles.guideButton}
+              onClick={openDownloadDB}
+            >
+              Download Your Database
+            </button>
+          </div>
+        </div>
+        <div className={styles.featuresContainer}>
+          <h1>Features</h1>
+          <h4>Discover how BookTrack can benefit your library.</h4>
+          <div className={styles.featureButtons}>
+            <button type="button" className={styles.featureButton}>
+              <h3>Book Search</h3>
+              <p className={garamond500.className}>
+                Easily find a book you've already got in your list or find books
+                to add to your list!
+              </p>
+            </button>
+            <button type="button" className={styles.featureButton}>
+              <h3>Reading Progress</h3>
+              <p className={garamond500.className}>
+                Track your current progress for each book with both percentage
+                completion and page counts!
+              </p>
+            </button>
+            <button type="button" className={styles.featureButton}>
+              <h3>Custom Lists</h3>
+              <p className={garamond500.className}>
+                Create your own lists of books on top of the default lists we
+                provide for you
+              </p>
+            </button>
+            <button type="button" className={styles.featureButton}>
+              <h3>Set and Track Goals</h3>
+              <p className={garamond500.className}>
+                Set personal goals and choose to have reminders sent to you
+                regularly.
+              </p>
+            </button>
+          </div>
+          <button type="button" className={styles.dbButton}>
+            <h3>Database Management</h3>
+            <p className={garamond500.className}>
+              Your own personal database that you can manage and have complete
+              control over!
+            </p>
+            <p className={garamond500.className}>
+              Learn more about Turso
+              <a className={garamond500.className}> here!</a>
+            </p>
+          </button>
+        </div>
+      </main>
+    </>
+  );
 }
