@@ -36,7 +36,6 @@ pub struct DBItem {
     image: String,
 }
 
-#[tauri::command]
 fn get_config() -> Config {
     config::Config::from_config_file()
 }
@@ -125,9 +124,11 @@ fn main() {
                 .get_window("main")
                 .expect("No window labeled 'main' found");
 
+            let app_handle = app.app_handle();
+
             // Perform initialization on a new task so app doesn't freeze
             tauri::async_runtime::spawn(async move {
-                println!("Initializing...");
+                println!("Getting all books in DB...");
 
                 match get_all_books().await {
                     Ok(books) => {
@@ -146,11 +147,20 @@ fn main() {
                 main_window.show().unwrap();
             });
 
+            println!("Getting config...");
+
+            let config = get_config();
+            println!("{:?}", config.clone());
+
+            match app_handle.emit_all("START_CONFIG", config) {
+                Ok(_) => println!("Config emitted to frontend"),
+                Err(e) => eprintln!("Unable to emit config to frontend\nError: {}", e),
+            };
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
             get_all_books,
-            get_config,
             update_config,
         ])
         .run(tauri::generate_context!())

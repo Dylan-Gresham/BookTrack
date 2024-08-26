@@ -20,6 +20,7 @@ import { userAtom } from "../lib/atoms";
 
 export default function Page() {
   const [username, setUsername] = useAtom<string | null>(userAtom);
+  const [startingName, _] = useState<string | null>(username);
 
   const [dbName, setDbName] = useState<string>("");
   const [dbURL, setDbURL] = useState<string>("");
@@ -151,7 +152,13 @@ export default function Page() {
             </button>
           </Link>
           <Link href="/">
-            <button type="button" className={style.formButton}>
+            <button
+              type="button"
+              className={style.formButton}
+              onClick={(_: React.MouseEvent<HTMLButtonElement>) => {
+                setUsername(startingName);
+              }}
+            >
               Cancel
             </button>
           </Link>

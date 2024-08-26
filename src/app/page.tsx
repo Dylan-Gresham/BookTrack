@@ -1,7 +1,10 @@
 "use client";
 
 // React imports
-import { useRef, MutableRefObject } from "react";
+import { useRef, useEffect, MutableRefObject } from "react";
+
+// Jotai
+import { useSetAtom, useAtom } from "jotai";
 
 // Tauri imports
 import { invoke } from "@tauri-apps/api/tauri";
@@ -22,12 +25,18 @@ import {
   openSetup,
   openUpgrade,
 } from "./lib/openers";
+import { Config, instanceOfConfig } from "./lib/config";
+import { listen } from "@tauri-apps/api/event";
+import { configAtom, userAtom } from "./lib/atoms";
 
 // Define font
 const garamond500 = Cormorant_Garamond({ subsets: ["latin"], weight: "500" });
 
 // Home Component
 export default function Home() {
+  // Import the configAtom and userAtom setter functions
+  const [config, setConfig] = useAtom(configAtom);
+  const setUser = useSetAtom(userAtom);
   const guidesRef = useRef() as MutableRefObject<HTMLDivElement>;
   function scrollToGuides(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
@@ -37,6 +46,29 @@ export default function Home() {
       behavior: "smooth",
     });
   }
+
+  useEffect(() => {
+    (async () => {
+      // Listen for the Tauri event from the backend
+      await listen("START_CONFIG", (payload: any) => {
+        // If the payload from the event is able to be casted to a Config...
+
+        if (instanceOfConfig(payload.payload)) {
+          // Do the cast
+          let config = payload.payload as Config;
+
+          // Call the setter function
+          setConfig(config);
+        } else {
+          // If it's not a Config...
+
+          // Log it and set undefined
+          console.log("No default config found");
+          setConfig(undefined);
+        }
+      });
+    })();
+  }, []);
 
   return (
     <>

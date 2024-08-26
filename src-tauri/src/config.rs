@@ -17,7 +17,7 @@ pub static DEFAULT_CONFIG: &'static str = indoc! {r#"
 }
 "#};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Config {
     pub username: String,
     pub db_name: String,
