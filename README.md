@@ -13,7 +13,7 @@ A book tracking application made by
 
 ## Setting up the Environment
 
-```console
+```bash
 $ git clone https://github.com/Dylan-Gresham/Booktrack.git
 $ cd Booktrack
 $ yarn
@@ -27,7 +27,7 @@ The above commands will clone the repository, switch directories into the projec
 
 To run Booktrack, simply run the command:
 
-```console
+```bash
 $ yarn tauri dev
 ```
 
