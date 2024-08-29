@@ -1,3 +1,0 @@
-[submodule "src-tauri/src/book_api"]
-	path = src-tauri/src/book_api
-	url = git@github.com:Dylan-Gresham/book-api.git
