@@ -1,22 +1,22 @@
 // NextJS imports
 import Link from "next/link";
 
-// Jotai
+// Jotai imports
+import { userInfoAtom } from "../lib/atoms";
 import { useAtomValue } from "jotai";
 
-// CSS import
+// CSS imports
 import styles from "../styles/header.module.css";
-import { userAtom } from "../lib/atoms";
 
 export default function Header() {
-  const user = useAtomValue(userAtom);
+  const userInfo = useAtomValue(userInfoAtom);
 
-  if (user !== null) {
+  if (userInfo !== null) {
     return (
       <header className={styles.headerContainer}>
         <h2>BookTrack</h2>
         <div className={styles.headerButtonsContainer}>
-          <p>{user}</p>
+          <p>{userInfo.userConfig.username}</p>
         </div>
       </header>
     );

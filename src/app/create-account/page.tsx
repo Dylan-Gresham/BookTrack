@@ -16,23 +16,28 @@ import { invoke } from "@tauri-apps/api/tauri";
 import style from "../styles/createAccount.module.css";
 
 // Library import
-import { userAtom } from "../lib/atoms";
+import { UserInfo, userInfoAtom } from "../lib/atoms";
+import { Config } from "../lib/config";
 
 export default function Page() {
-  const [username, setUsername] = useAtom<string | null>(userAtom);
-  const [startingName, _] = useState<string | null>(username);
+  // Define state variables
+  const [userInfo, setUserInfo] = useAtom<UserInfo | null>(userInfoAtom);
+  const [startingName, _] = useState<string | null>(
+    userInfo ? userInfo.userConfig.username : null,
+  );
 
   const [dbName, setDbName] = useState<string>("");
   const [dbURL, setDbURL] = useState<string>("");
   const [dbToken, setDbToken] = useState<string>("");
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
+  // Define wrapper function for handling the form submission
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     e.stopPropagation();
 
     invoke("update_config", {
-      username: username,
+      username: userInfo?.userConfig.username,
       dbName: dbName,
       dbUrl: dbURL,
       dbToken: dbToken,
@@ -42,6 +47,7 @@ export default function Page() {
       .catch((errMsg) => console.error(errMsg));
   }
 
+  // Define account creation interface
   return (
     <div className={style.container}>
       <h1 className={style.title}>Create Account</h1>
@@ -54,8 +60,40 @@ export default function Page() {
             className={style.textInput}
             type="text"
             id="username"
-            value={username ? username : ""}
-            onChange={(e) => setUsername(e.target.value)}
+            value={userInfo ? userInfo.userConfig.username : ""}
+            onChange={(e) => {
+              // Define default user config
+              let defaultUserConfig: Config = {
+                username: "",
+                dbName: "",
+                dbUrl: "",
+                dbToken: "",
+                theme: "dark",
+              };
+
+              // Check nullity for TypeScript to be happy
+              if (userInfo) {
+                // If it's not null, spread the previous userInfo out
+                setUserInfo({
+                  ...userInfo,
+                  userConfig: {
+                    ...userInfo.userConfig,
+                    // And update the username field
+                    username: e.target.value,
+                  },
+                });
+              } else {
+                // If it's null, spread the default config out
+                setUserInfo({
+                  userConfig: {
+                    ...defaultUserConfig,
+                    // And update the username field
+                    username: e.target.value,
+                  },
+                  userBooks: [],
+                });
+              }
+            }}
             required
           />
         </div>
@@ -135,7 +173,7 @@ export default function Page() {
                 e.stopPropagation();
 
                 invoke("update_config", {
-                  username: username,
+                  username: userInfo ? userInfo.userConfig.username : "",
                   dbName: dbName,
                   dbUrl: dbURL,
                   dbToken: dbToken,
@@ -156,7 +194,37 @@ export default function Page() {
               type="button"
               className={style.formButton}
               onClick={(_: React.MouseEvent<HTMLButtonElement>) => {
-                setUsername(startingName);
+                // Define default user config
+                let defaultUserConfig: Config = {
+                  username: "",
+                  dbName: "",
+                  dbUrl: "",
+                  dbToken: "",
+                  theme: "dark",
+                };
+
+                // Check nullity for TypeScript to be happy
+                if (userInfo) {
+                  // If it's not null, spread the previous userInfo out
+                  setUserInfo({
+                    ...userInfo,
+                    userConfig: {
+                      ...userInfo.userConfig,
+                      // And revert the username field
+                      username: startingName ? startingName : "",
+                    },
+                  });
+                } else {
+                  // If it's null, spread the default config out
+                  setUserInfo({
+                    userConfig: {
+                      ...defaultUserConfig,
+                      // And revert the username field
+                      username: startingName ? startingName : "",
+                    },
+                    userBooks: [],
+                  });
+                }
               }}
             >
               Cancel

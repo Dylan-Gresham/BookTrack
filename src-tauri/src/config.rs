@@ -1,10 +1,13 @@
+// Rust std library imports
 use std::fs;
 
+// 3rd-party crate imports
 use dirs;
 use indoc::indoc;
 use serde::{Deserialize, Serialize};
 use serde_json;
 
+// Define constants
 pub static CONFIG_FILE: &'static str = "/config.json";
 pub static CONFIG_DIR: &'static str = "/booktrack";
 pub static DEFAULT_CONFIG: &'static str = indoc! {r#"
@@ -17,6 +20,22 @@ pub static DEFAULT_CONFIG: &'static str = indoc! {r#"
 }
 "#};
 
+// Define Config struct fields and methods
+
+/// # Booktrack::Config
+///
+/// Struct containing the fields for the configuration file.
+///
+/// The configuration file itself will live in the users default configuration path ->
+/// booktrack/config.json.
+///
+/// According to the `dirs` crate documentation, this path is:
+///
+/// ```console
+/// Linux = /home/<USER>/.config/booktrack/config.json
+/// MacOS = /Users/<USER>/Library/Application Support/booktrack/config.json
+/// Windows = C:\Users\<USER>\AppData\Roaming\booktrack\config.json
+/// ```
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Config {
     pub username: String,
@@ -27,6 +46,18 @@ pub struct Config {
 }
 
 impl Config {
+    /// # Booktrack::Config::from_config_file
+    ///
+    /// Reads the configuratin file from disk.
+    ///
+    /// ## Returns
+    ///
+    /// Always returns a Confing struct.
+    ///
+    /// If the configuration file exists, can be read, and is a valid JSON format that can be read
+    /// by `serde_json::from_str` that is what is returned.
+    ///
+    /// If any of the above conditions aren't met, then the default configuration is returned.
     pub fn from_config_file() -> Config {
         match read_config() {
             Ok(config_string) => match serde_json::from_str(&config_string) {
@@ -37,6 +68,9 @@ impl Config {
         }
     }
 
+    /// # Booktrack::Config::default_config
+    ///
+    /// Returns a Config struct with the default values.
     pub fn default_config() -> Config {
         Config {
             username: "".into(),
@@ -48,7 +82,7 @@ impl Config {
     }
 }
 
-/// ## read_config
+/// ## Booktrack::read_config
 ///
 /// If a configuration file already exists at $CONFIG_DIR/booktrack/config.json
 /// reads it and returns it as an Ok(String). Otherwise, it creates a new
@@ -100,7 +134,7 @@ pub fn read_config() -> Result<String, String> {
     }
 }
 
-/// ## write_config
+/// ## Booktrack::write_config
 ///
 /// Writes the input config to the config file. If the write
 /// was successful, returns an Ok(()). If the write failed,

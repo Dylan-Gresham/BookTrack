@@ -3,11 +3,12 @@
 // React imports
 import { useRef, useEffect, MutableRefObject } from "react";
 
-// Jotai
-import { useSetAtom, useAtom } from "jotai";
+// Jotai imports
+import { useSetAtom } from "jotai";
 
 // Tauri imports
 import { invoke } from "@tauri-apps/api/tauri";
+import { listen, UnlistenFn } from "@tauri-apps/api/event";
 
 // Style imports
 import { Cormorant_Garamond } from "next/font/google";
@@ -26,17 +27,18 @@ import {
   openUpgrade,
 } from "./lib/openers";
 import { Config, instanceOfConfig } from "./lib/config";
-import { listen } from "@tauri-apps/api/event";
-import { configAtom, userAtom } from "./lib/atoms";
+import { userInfoAtom, UserInfo } from "./lib/atoms";
+import { BookList, instanceOfBookList } from "./lib/booklist";
 
 // Define font
 const garamond500 = Cormorant_Garamond({ subsets: ["latin"], weight: "500" });
 
 // Home Component
 export default function Home() {
-  // Import the configAtom and userAtom setter functions
-  const [config, setConfig] = useAtom(configAtom);
-  const setUser = useSetAtom(userAtom);
+  // Import the userInfo setter function
+  const setUserInfo = useSetAtom(userInfoAtom);
+
+  // Define guides scroller
   const guidesRef = useRef() as MutableRefObject<HTMLDivElement>;
   function scrollToGuides(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
@@ -47,32 +49,74 @@ export default function Home() {
     });
   }
 
+  // Define behavior to do on first render
   useEffect(() => {
-    (async () => {
-      // Listen for the Tauri event from the backend
-      await listen("START_CONFIG", (payload: any) => {
-        // If the payload from the event is able to be casted to a Config...
+    invoke("print_to_console", { msg: "Entering useEffect" });
+    let configGotten = false;
+    let config: Config = {
+      username: "",
+      dbName: "",
+      dbUrl: "",
+      dbToken: "",
+      theme: "dark",
+    };
+    let booksGotten = false;
+    let books: BookList = [];
 
-        if (instanceOfConfig(payload.payload)) {
-          // Do the cast
-          let config = payload.payload as Config;
+    invoke("print_to_console", { msg: "Listening to START_CONFIG" });
 
-          // Call the setter function
-          setConfig(config);
-        } else {
-          // If it's not a Config...
+    listen("START_CONFIG", (payload: any) => {
+      // If the payload from the event is able to be casted to a Config...
+      if (instanceOfConfig(payload.payload)) {
+        // Do the cast and set the appropriate variable
+        config = payload.payload as Config;
+      } else {
+        console.log("No default config found");
+      }
 
-          // Log it and set undefined
-          console.log("No default config found");
-          setConfig(undefined);
-        }
-      });
-    })();
+      invoke("print_to_console", { msg: "Config gotten set to true" });
+      configGotten = true;
+    }).then((f) => f());
+
+    invoke("print_to_console", { msg: "Listening to START_BOOKS" });
+
+    listen("START_BOOKS", (payload: any) => {
+      // If the payload from the event is able to be casted to a BookList...
+      if (instanceOfBookList(payload.payload)) {
+        // Do the cast and set the appropriate variable
+        books = payload.payload as BookList;
+      } else {
+        console.log("No books in database at start");
+      }
+
+      invoke("print_to_console", { msg: "Books gotten set to true" });
+      booksGotten = true;
+    }).then((f) => f());
+
+    invoke("print_to_console", { msg: "Starting potential infinite while" });
+
+    // Loop until both listeners finish
+    while (!configGotten);
+    while (!booksGotten);
+
+    invoke("print_to_console", { msg: "End potential infinite while" });
+
+    let newUserInfo: UserInfo = { userConfig: config, userBooks: books };
+
+    setUserInfo(newUserInfo);
+
+    invoke("print_to_console", { msg: "State set" });
   }, []);
 
   return (
     <>
       <Header />
+
+      {/* Define main home page layout.
+       * Eventually there will need to be logic here that will tell
+       * it to either render this on launch or the user's library page
+       * when that's made.
+       */}
       <main className={styles.main}>
         <div className={styles.welcomeContainer}>
           <h1>Welcome to BookTrack!</h1>
@@ -82,6 +126,7 @@ export default function Home() {
             are, this app makes it simple to organize your library, set personal
             goals, and stay motivated!
           </p>
+          {/* Testing button for running database get all query */}
           <button
             type="button"
             onClick={async (e: any) => {
@@ -114,6 +159,7 @@ export default function Home() {
             </button>
           </span>
         </div>
+        {/* The ref here is used for scrolling. See the `scrollToGuides` function for details */}
         <div ref={guidesRef} className={styles.guideContainer}>
           <h1>Guides</h1>
           <p>

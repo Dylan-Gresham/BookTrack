@@ -1,5 +1,14 @@
+// Jotai imports
 import { atom } from "jotai";
-import { Config } from "./config";
 
-export const userAtom = atom<string | null>(null);
-export const configAtom = atom<Config | undefined>(undefined);
+// Libary imports
+import { Config } from "./config";
+import { BookList } from "./booklist";
+
+export interface UserInfo {
+  userConfig: Config;
+  userBooks: BookList;
+}
+
+// Define atoms for user account details
+export const userInfoAtom = atom<UserInfo | null>(null);
