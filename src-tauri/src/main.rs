@@ -3,10 +3,12 @@
 
 // Define and use the Config module
 mod config;
+use std::sync::Mutex;
+
 use config::Config;
 
 // Tauri imports
-use tauri::Manager;
+use tauri::{Manager, State};
 
 // 3rd-party crate imports
 use libsql::{Builder, Connection};
@@ -44,6 +46,17 @@ pub struct DBItem {
     total_pages: u32,
     pages_read: u32,
     image: String,
+}
+
+// Define state structs
+
+struct DbConnection {
+    conn: Mutex<Option<libsql::Connection>>,
+}
+
+#[derive(Serialize, Deserialize)]
+struct BookList {
+    list: Mutex<Vec<DBItem>>,
 }
 
 // Alias function for readability
@@ -151,11 +164,36 @@ fn print_to_console(msg: String) {
     println!("{}", msg);
 }
 
+#[tauri::command]
+fn add_to_booklist(book: DBItem, state: State<BookList>) {
+    state.list.lock().unwrap().push(book);
+}
+
+#[tauri::command]
+async fn refresh_db_connection(state: State<'_, DbConnection>) -> Result<()> {
+    *state.conn.lock().unwrap() = match get_db_connection().await {
+        Ok(c) => Some(c),
+        Err(_) => None,
+    };
+
+    Ok(())
+}
+
+#[tauri::command]
+fn get_config_from_state(state: State<Config>) -> Config {
+    state.inner().clone()
+}
+
+#[tauri::command]
+fn get_booklist_from_state(state: State<BookList>) -> Vec<DBItem> {
+    state.list.lock().unwrap().to_vec()
+}
+
 fn main() {
     tracing_subscriber::fmt::init();
 
     tauri::Builder::default()
-        .setup(|app| {
+        .setup(|app: &mut tauri::App| {
             // Get the app and windows
             let splashscreen_window = app
                 .get_window("splashscreen")
@@ -164,71 +202,64 @@ fn main() {
                 .get_window("main")
                 .expect("No window labeled 'main' found");
 
+            let app_handle = app.app_handle();
+
+            app.manage(DbConnection { conn: Mutex::new(None) });
+
             // Perform initialization on a new task so app doesn't freeze
             tauri::async_runtime::spawn(async move {
-                println!("Getting all books in DB...");
+                println!("Initializing database connection...");
 
-                let books: Option<Vec<DBItem>> = match get_all_books().await {
-                    Ok(books) => {
-                        println!("Books:");
-                        for book in &books {
-                            println!("\t{:?}", book);
-                        }
-
-                        Some(books)
-                    }
+                match refresh_db_connection(app_handle.state()).await {
+                    Ok(_) => println!("Done initializing database connection!"),
                     Err(_) => {
-                        println!("Unable to get books");
-
-                        None
+                        loop {
+                            match refresh_db_connection(app_handle.state()).await {
+                                Ok(_) => println!("Done initializing database connection!"),
+                                Err(_) => continue,
+                            }
+                        }
                     }
                 };
 
-                println!("Done initializing!");
+                println!("Initializing book list...");
 
-                println!("Getting config...");
+                let mut books: Vec<DBItem> = Vec::with_capacity(25);
+                match get_all_books().await {
+                    Ok(books_db) => {
+                        for book in books_db {
+                            books.push(book);
+                        }
+                    }
+                    Err(_) => (),
+                };
 
-                let config = get_config();
-                println!("{:?}", config.clone());
+                // Add state to the app
+                app_handle.manage(BookList { list: Mutex::new(books) });
+
+                println!("Done initializing book list!");
+
+                println!("Initializing config...");
+
+                // Add config to the app state
+                app_handle.manage(get_config());
+
+                println!("Config initialized!");
 
                 // Close splashscreen and show main window
                 splashscreen_window.close().unwrap();
                 main_window.show().unwrap();
-
-                tokio::time::sleep(tokio::time::Duration::from_secs(3)).await;
-
-                // Emit the configuration to the frontend
-                match &main_window.emit("START_CONFIG", config) {
-                    Ok(_) => println!("Config emitted to frontend"),
-                    Err(e) => eprintln!("Unable to emit config to frontend\nError: {}", e),
-                };
-
-                // Emit the starting books array to the frontend
-                if let Some(books_vec) = books {
-                    match &main_window.emit("START_BOOKS", books_vec) {
-                        Ok(_) => println!("Books emitted to frontend"),
-                        Err(e) => eprintln!("Unable to emit config to frontend\nError: {}", e),
-                    };
-                } else {
-                    // If there's no books to send, send an empty array anyways
-                    //
-                    // This prevents complicated logic with the frontend where
-                    // we'd have to listen for the event to either occur or some other criteria
-                    // to happen to stop listening for this event.
-                    let books_vec: Vec<DBItem> = Vec::with_capacity(0);
-                    match &main_window.emit("START_BOOKS", books_vec) {
-                        Ok(_) => println!("Books emitted to frontend"),
-                        Err(e) => eprintln!("Unable to emit config to frontend\nError: {}", e),
-                    };
-                }
             });
-
 
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
             get_all_books,
             update_config,
+            add_to_booklist,
+            refresh_db_connection,
+            get_config_from_state,
+            get_booklist_from_state,
             print_to_console,
         ])
         .run(tauri::generate_context!())

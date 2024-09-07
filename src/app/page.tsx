@@ -4,11 +4,11 @@
 import { useRef, useEffect, MutableRefObject } from "react";
 
 // Jotai imports
-import { useSetAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 
 // Tauri imports
 import { invoke } from "@tauri-apps/api/tauri";
-import { listen, UnlistenFn } from "@tauri-apps/api/event";
+import { listen } from "@tauri-apps/api/event";
 
 // Style imports
 import { Cormorant_Garamond } from "next/font/google";
@@ -26,9 +26,9 @@ import {
   openSetup,
   openUpgrade,
 } from "./lib/openers";
-import { Config, instanceOfConfig } from "./lib/config";
+import { Config } from "./lib/config";
 import { userInfoAtom, UserInfo } from "./lib/atoms";
-import { BookList, instanceOfBookList } from "./lib/booklist";
+import { BookList } from "./lib/booklist";
 
 // Define font
 const garamond500 = Cormorant_Garamond({ subsets: ["latin"], weight: "500" });
@@ -36,7 +36,8 @@ const garamond500 = Cormorant_Garamond({ subsets: ["latin"], weight: "500" });
 // Home Component
 export default function Home() {
   // Import the userInfo setter function
-  const setUserInfo = useSetAtom(userInfoAtom);
+  //const setUserInfo = useSetAtom(userInfoAtom);
+  const [userInfo, setUserInfo] = useAtom(userInfoAtom);
 
   // Define guides scroller
   const guidesRef = useRef() as MutableRefObject<HTMLDivElement>;
@@ -52,61 +53,22 @@ export default function Home() {
   // Define behavior to do on first render
   useEffect(() => {
     invoke("print_to_console", { msg: "Entering useEffect" });
-    let configGotten = false;
-    let config: Config = {
-      username: "",
-      dbName: "",
-      dbUrl: "",
-      dbToken: "",
-      theme: "dark",
+
+    const initialize = async () => {
+      let userConfig = await invoke<Config>("get_config_from_state");
+      let userBooks = await invoke<BookList>("get_booklist_from_state");
+
+      let newUserInfo: UserInfo = { userConfig, userBooks };
+
+      setUserInfo(newUserInfo);
     };
-    let booksGotten = false;
-    let books: BookList = [];
 
-    invoke("print_to_console", { msg: "Listening to START_CONFIG" });
-
-    listen("START_CONFIG", (payload: any) => {
-      // If the payload from the event is able to be casted to a Config...
-      if (instanceOfConfig(payload.payload)) {
-        // Do the cast and set the appropriate variable
-        config = payload.payload as Config;
-      } else {
-        console.log("No default config found");
-      }
-
-      invoke("print_to_console", { msg: "Config gotten set to true" });
-      configGotten = true;
-    }).then((f) => f());
-
-    invoke("print_to_console", { msg: "Listening to START_BOOKS" });
-
-    listen("START_BOOKS", (payload: any) => {
-      // If the payload from the event is able to be casted to a BookList...
-      if (instanceOfBookList(payload.payload)) {
-        // Do the cast and set the appropriate variable
-        books = payload.payload as BookList;
-      } else {
-        console.log("No books in database at start");
-      }
-
-      invoke("print_to_console", { msg: "Books gotten set to true" });
-      booksGotten = true;
-    }).then((f) => f());
-
-    invoke("print_to_console", { msg: "Starting potential infinite while" });
-
-    // Loop until both listeners finish
-    while (!configGotten);
-    while (!booksGotten);
-
-    invoke("print_to_console", { msg: "End potential infinite while" });
-
-    let newUserInfo: UserInfo = { userConfig: config, userBooks: books };
-
-    setUserInfo(newUserInfo);
+    initialize().catch((err) => console.error(err));
 
     invoke("print_to_console", { msg: "State set" });
   }, []);
+
+  console.log(userInfo);
 
   return (
     <>
