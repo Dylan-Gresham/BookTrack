@@ -1,15 +1,15 @@
 # BookTrack
 
 A book tracking application made by
-[Dylan Gresham](https://www.github.com/Dylan-Gresham) using Tauri & Next.js
+[Dylan Gresham](https://www.github.com/Dylan-Gresham), [Brenek Harrison](https://github.com/BrenekH), and [Francisco Murguia](https://github.com/FranciscoMurguia) using Tauri & Next.js.
 
 # Getting Started
 
 ## Requirements
 
-- NodeJS
-- Yarn
-- Rust
+- [NodeJS](https://nodejs.org/en/download/package-manager/current)
+- [Yarn 1](https://classic.yarnpkg.com/lang/en/docs/install/#debian-stable)
+- [Rust](https://www.rust-lang.org/tools/install)
 
 ## Setting up the Environment
 
@@ -25,13 +25,11 @@ The above commands will clone the repository, switch directories into the projec
 
 ## Running
 
-To run Booktrack, simply run the command:
+To run Booktrack, simply run the below command from anywhere within the Booktrack directory (including directories within Booktrack).
 
 ```bash
 $ yarn tauri dev
 ```
-
-from anywhere within the Booktrack directory (including directories within Booktrack).
 
 # Current Capabilities
 
@@ -41,18 +39,3 @@ Once the splashscreen closes, you can view the home page of Booktrack. The home 
 
 When the create account button is clicked, it opens a (very ugly) "account" creation page (route). This page contains fields for your username, database name, database URL, database token, and the app's theme. There's also a create account button and a cancel button at the bottom. The create account button will create a file in the `$CONFIG/booktrack` directory called `config.json` which will contain the data that you input. The cancel button will reset the username field (global state variable) to it's value when you first clicked the create account button from the home page. Both buttons will bring you back to the home page after clicking them, except for in the case where you try to create an account without filling in all the information.
 
-# Future Functionality
-
-1. Fix Create Account route (styling, verification, input feedback, account creation guide).
-2. Change the home page to a different page when a valid account is "signed in" (config file exists with a username and a database that exists and can be read from).
-3. Automatically read in the username on start
-4. If a config file already exists with valid user info, open Booktrack to the "Library" route
-5. Create Library route which will show all books in the user's library (database)
-6. Within the Library route, create a section for current reading progress
-    - Book name & author
-    - Current # of pages read
-    - \# of pages in the book
-    - Progress bar to show progress visually
-    - Dropdown/button to allow modification of reading progress
-7. Ability to add books to the library
-    - Probably with an API like Google Books to automatically find books and their statistics based off the user's input
