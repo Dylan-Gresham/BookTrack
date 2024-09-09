@@ -10,3 +10,7 @@
     align-items: center;
     color: #F0E5E9;
 }
+
+.ghButton {
+    text-decoration: underline;
+}
