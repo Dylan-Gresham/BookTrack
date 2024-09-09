@@ -12,6 +12,12 @@ function openDylanGitHubPage(e: any) {
   open("https://github.com/Dylan-Gresham");
 }
 
+function openFranciscoMurguiaGitHubPage(e: any) {
+    e.preventDefault();
+  
+    open("https://github.com/FranciscoMurguia");
+  }
+
 export default function Footer() {
   return (
     <footer className={styles.footerContainer}>
@@ -20,7 +26,13 @@ export default function Footer() {
         <a className={styles.ghButton} onClick={openDylanGitHubPage}>
           Dylan Gresham
         </a>
+        , <a className={styles.ghButton} onClick={openFranciscoMurguiaGitHubPage}>
+          Francisco Murguia
+        </a>
         , All Rights Reserved
+
+        
+
       </h6>
     </footer>
   );
