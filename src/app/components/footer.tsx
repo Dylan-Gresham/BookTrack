@@ -32,10 +32,9 @@ export default function Footer() {
           Dylan Gresham
         </a>
         , <a className={styles.ghButton} onClick={openFranciscoMurguiaGitHubPage}>
-          Francisco Murguia
-          </a>
-        , 
-        <a className={styles.ghButton} onClick={openBrenekGitHubPage}>
+         Francisco Murguia
+         </a>
+        , <a className={styles.ghButton} onClick={openBrenekGitHubPage}>
           Brenek Harrison
         </a>
         , All Rights Reserved
