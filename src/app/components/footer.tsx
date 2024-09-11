@@ -13,10 +13,10 @@ function openDylanGitHubPage(e: any) {
 }
 
 function openFranciscoMurguiaGitHubPage(e: any) {
-    e.preventDefault();
-  
-    open("https://github.com/FranciscoMurguia");
-  }
+  e.preventDefault();
+
+  open("https://github.com/FranciscoMurguia");
+}
 function openBrenekGitHubPage(e: any) {
   e.preventDefault();
 
@@ -31,17 +31,16 @@ export default function Footer() {
         <a className={styles.ghButton} onClick={openDylanGitHubPage}>
           Dylan Gresham
         </a>
-        , <a className={styles.ghButton} onClick={openFranciscoMurguiaGitHubPage}>
-         Francisco Murguia
-         </a>
-        , <a className={styles.ghButton} onClick={openBrenekGitHubPage}>
+        ,{" "}
+        <a className={styles.ghButton} onClick={openFranciscoMurguiaGitHubPage}>
+          Francisco Murguia
+        </a>
+        ,{" "}
+        <a className={styles.ghButton} onClick={openBrenekGitHubPage}>
           Brenek Harrison
         </a>
-        , All Rights Reserved
-
-        
-
+        {" All Rights Reserved"}
       </h6>
     </footer>
-  )
+  );
 }
