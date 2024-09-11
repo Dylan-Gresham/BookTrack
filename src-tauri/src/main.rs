@@ -202,9 +202,16 @@ fn main() {
                 .get_window("main")
                 .expect("No window labeled 'main' found");
 
-            let app_handle = app.app_handle();
-
             app.manage(DbConnection { conn: Mutex::new(None) });
+
+            println!("Initializing config...");
+
+            // Add config to the app state
+            app.manage(get_config());
+
+            println!("Config initialized!");
+
+            let app_handle = app.app_handle();
 
             // Perform initialization on a new task so app doesn't freeze
             tauri::async_runtime::spawn(async move {
@@ -238,13 +245,6 @@ fn main() {
                 app_handle.manage(BookList { list: Mutex::new(books) });
 
                 println!("Done initializing book list!");
-
-                println!("Initializing config...");
-
-                // Add config to the app state
-                app_handle.manage(get_config());
-
-                println!("Config initialized!");
 
                 // Close splashscreen and show main window
                 splashscreen_window.close().unwrap();

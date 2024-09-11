@@ -35,3 +35,17 @@
     align-items: center;
 }
 
+.link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.link,
+.link * {
+    cursor: pointer;
+}
+
+.link:visited {
+    color: inherit;
+}
+

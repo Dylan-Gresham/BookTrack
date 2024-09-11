@@ -14,8 +14,13 @@ export default function Header() {
   if (userInfo !== null) {
     return (
       <header className={styles.headerContainer}>
-        <h2>BookTrack</h2>
+        <Link href="/" className={styles.link}>
+          <h2>BookTrack</h2>
+        </Link>
         <div className={styles.headerButtonsContainer}>
+          <Link href="/library" className={styles.link}>
+            My Library
+          </Link>
           <p>{userInfo.userConfig.username}</p>
         </div>
       </header>
@@ -25,7 +30,9 @@ export default function Header() {
       <header className={styles.headerContainer}>
         <h2>BookTrack</h2>
         <div className={styles.headerButtonsContainer}>
-          <Link href="/create-account">Create Account</Link>
+          <Link href="/create-account" className={styles.link}>
+            Create Account
+          </Link>
         </div>
       </header>
     );

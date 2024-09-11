@@ -1,0 +1,8 @@
+.libraryMain {
+    background-color: #CBC0AE;
+    height: 100%;
+    width: 100%;
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+}

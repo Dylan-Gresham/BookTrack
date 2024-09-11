@@ -4,11 +4,10 @@
 import { useRef, useEffect, MutableRefObject } from "react";
 
 // Jotai imports
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom } from "jotai";
 
 // Tauri imports
 import { invoke } from "@tauri-apps/api/tauri";
-import { listen } from "@tauri-apps/api/event";
 
 // Style imports
 import { Cormorant_Garamond } from "next/font/google";
@@ -73,7 +72,6 @@ export default function Home() {
   return (
     <>
       <Header />
-
       {/* Define main home page layout.
        * Eventually there will need to be logic here that will tell
        * it to either render this on launch or the user's library page
