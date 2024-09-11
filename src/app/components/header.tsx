@@ -11,7 +11,7 @@ import styles from "../styles/header.module.css";
 export default function Header() {
   const userInfo = useAtomValue(userInfoAtom);
 
-  if (userInfo !== null) {
+  if (userInfo !== null && userInfo.userConfig.username !== "") {
     return (
       <header className={styles.headerContainer}>
         <Link href="/" className={styles.link}>
