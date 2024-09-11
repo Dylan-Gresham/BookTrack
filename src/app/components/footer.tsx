@@ -17,6 +17,11 @@ function openFranciscoMurguiaGitHubPage(e: any) {
   
     open("https://github.com/FranciscoMurguia");
   }
+function openBrenekGitHubPage(e: any) {
+  e.preventDefault();
+
+  open("https://github.com/BrenekH");
+}
 
 export default function Footer() {
   return (
@@ -28,6 +33,10 @@ export default function Footer() {
         </a>
         , <a className={styles.ghButton} onClick={openFranciscoMurguiaGitHubPage}>
           Francisco Murguia
+          </a>
+        , 
+        <a className={styles.ghButton} onClick={openBrenekGitHubPage}>
+          Brenek Harrison
         </a>
         , All Rights Reserved
 
@@ -35,5 +44,5 @@ export default function Footer() {
 
       </h6>
     </footer>
-  );
+  )
 }
