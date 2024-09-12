@@ -1,8 +1,6 @@
-// Defining the BookList type
-export type BookList = Book[];
-
 // Defining the Book interface
-export interface Book {
+export interface BookType {
+  id: number;
   title: string;
   author: string;
   image: string;
@@ -10,11 +8,15 @@ export interface Book {
   pagesRead: number;
 }
 
+// Defining the BookList type
+export type BookList = BookType[];
+
 /**
  * Checks if the object is an instance of the Book interface
  */
-export function instanceOfBook(object: any): object is Book {
+export function instanceOfBook(object: any): object is BookType {
   if (
+    object.id !== undefined &&
     object.title !== undefined &&
     object.author !== undefined &&
     object.image !== undefined &&
