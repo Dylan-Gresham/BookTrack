@@ -23,11 +23,13 @@ export default function Library() {
   const userBooks: Array<BookType> = userInfo ? userInfo.userBooks : [];
   let splitUserBooks: Array<Array<BookType>> = [];
 
-  if (userBooks.length <= 5) {
-    splitUserBooks = [userBooks];
-  } else {
-    for (let i = 0; i < userBooks.length; i += CHUNK_SIZE) {
-      splitUserBooks.concat(userBooks.slice(i, i + CHUNK_SIZE));
+  let chunk: Array<BookType> = [];
+  for (let i = 0; i < userBooks.length; i++) {
+    chunk.push(userBooks[i]);
+
+    if ((i + 1) % CHUNK_SIZE === 0) {
+      splitUserBooks.push(chunk);
+      chunk = [];
     }
   }
 
@@ -41,6 +43,20 @@ export default function Library() {
     <>
       <Header />
       <main className={styles.libraryMain} style={{ backgroundColor: bgColor }}>
+        <div className={(styles.sticky, styles.controls)}>
+          <span className={styles.controlPlaceholder}></span>
+          <div className={styles.controlButtonsContainer}>
+            <button type="button" className={styles.controlButton}>
+              New Book
+            </button>
+            <button type="button" className={styles.controlButton}>
+              New List
+            </button>
+            <button type="button" className={styles.controlButton}>
+              Sort
+            </button>
+          </div>
+        </div>
         {userBooks.length > 0 &&
           splitUserBooks.map((slice: Array<BookType>) => {
             return (

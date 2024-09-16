@@ -67,8 +67,6 @@ export default function Home() {
     invoke("print_to_console", { msg: "State set" });
   }, []);
 
-  console.log(userInfo);
-
   return (
     <>
       <Header />
