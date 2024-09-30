@@ -20,7 +20,7 @@ const CHUNK_SIZE = 5; // Library's row length
 export default function Library() {
   const userInfo = useAtomValue(userInfoAtom);
 
-  let userBooks: Array<BookType> = userInfo ? userInfo.userBooks : [];
+  const userBooks: Array<BookType> = userInfo ? userInfo.userBooks : [];
   let splitUserBooks: Array<Array<BookType>> = [];
 
   let chunk: Array<BookType> = [];
@@ -37,8 +37,6 @@ export default function Library() {
   if (userInfo) {
     bgColor = userInfo.userConfig.theme === "dark" ? "#CBC0AE" : "#5D707F";
   }
-
-  userBooks = [];
 
   let i = 0;
   return (
