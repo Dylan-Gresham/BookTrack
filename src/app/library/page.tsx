@@ -20,7 +20,7 @@ const CHUNK_SIZE = 5; // Library's row length
 export default function Library() {
   const userInfo = useAtomValue(userInfoAtom);
 
-  const userBooks: Array<BookType> = userInfo ? userInfo.userBooks : [];
+  let userBooks: Array<BookType> = userInfo ? userInfo.userBooks : [];
   let splitUserBooks: Array<Array<BookType>> = [];
 
   let chunk: Array<BookType> = [];
@@ -38,25 +38,13 @@ export default function Library() {
     bgColor = userInfo.userConfig.theme === "dark" ? "#CBC0AE" : "#5D707F";
   }
 
+  userBooks = [];
+
   let i = 0;
   return (
     <>
-      <Header />
+      <Header inLibrary={true} />
       <main className={styles.libraryMain} style={{ backgroundColor: bgColor }}>
-        <div className={(styles.sticky, styles.controls)}>
-          <span className={styles.controlPlaceholder}></span>
-          <div className={styles.controlButtonsContainer}>
-            <button type="button" className={styles.controlButton}>
-              New Book
-            </button>
-            <button type="button" className={styles.controlButton}>
-              New List
-            </button>
-            <button type="button" className={styles.controlButton}>
-              Sort
-            </button>
-          </div>
-        </div>
         {userBooks.length > 0 &&
           splitUserBooks.map((slice: Array<BookType>) => {
             return (
@@ -73,6 +61,7 @@ export default function Library() {
           })}
         {userBooks.length === 0 && (
           <button
+            className={styles.centeredButton}
             type="button"
             onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
               e.preventDefault();
