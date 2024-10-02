@@ -32,6 +32,18 @@ export function instanceOfBook(object: any): object is BookType {
 }
 
 /**
+ * Modifies the input book's list field.
+ *
+ * Parameters:
+ *
+ * - book `BookType` The book to modify
+ * - newList `string` The list to move the book to
+ */
+export function changeBookList(book: BookType, newList: string) {
+  book.list = newList;
+}
+
+/**
  * Checks if the object is an instance of the BookList type
  */
 export function instanceOfBookList(object: any): object is BookList {
