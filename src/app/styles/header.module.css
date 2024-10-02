@@ -1,13 +1,10 @@
-.headerContainer {
-    background-color: #2E2E3A;
-    color: #F0E5E9;
-}
-
 .headerButtonsContainer > button {
     background-color: #CBC0AE;
 }
 
 .headerContainer {
+    background-color: #2E2E3A;
+    color: #F0E5E9;
     margin-right: 1rem;
     margin-left: 0.5rem;
     grid-row: 1;
