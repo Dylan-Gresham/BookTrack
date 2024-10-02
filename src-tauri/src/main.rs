@@ -41,6 +41,7 @@ where
 /// Struct used for holding database entries.
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct DBItem {
+    id: u64,
     title: String,
     author: String,
     total_pages: u32,
@@ -119,11 +120,12 @@ async fn get_all_books() -> Result<Vec<DBItem>> {
     let mut books: Vec<DBItem> = Vec::new();
     while let Some(row) = results.next().await? {
         let book: DBItem = DBItem {
-            title: row.get(0)?,
-            author: row.get(1)?,
-            total_pages: row.get(2)?,
-            pages_read: row.get(3)?,
-            image: row.get(4)?,
+            id: row.get(0)?,
+            title: row.get(1)?,
+            author: row.get(2)?,
+            total_pages: row.get(3)?,
+            pages_read: row.get(4)?,
+            image: row.get(5)?,
         };
 
         books.push(book);
@@ -189,10 +191,30 @@ fn get_booklist_from_state(state: State<BookList>) -> Vec<DBItem> {
     state.list.lock().unwrap().to_vec()
 }
 
+fn initialize_booklist() -> BookList {
+    let mut books: Vec<DBItem> = Vec::with_capacity(25);
+
+    println!("Initializing book list...");
+
+    match tokio::runtime::Runtime::new().expect("Unable to create a Tokio runtime").block_on(get_all_books()) {
+        Ok(books_db) => books.extend(books_db),
+        Err(_) => eprintln!("Get all books returned none"),
+    };
+
+    println!("{:?}", books);
+
+    println!("Done initializing book list!");
+
+    BookList { list: Mutex::new(books) }
+}
+
 fn main() {
     tracing_subscriber::fmt::init();
 
     tauri::Builder::default()
+        .manage(initialize_booklist())
+        .manage(get_config())
+        .manage(DbConnection { conn: Mutex::new(None) })
         .setup(|app: &mut tauri::App| {
             // Get the app and windows
             let splashscreen_window = app
@@ -201,15 +223,6 @@ fn main() {
             let main_window = app
                 .get_window("main")
                 .expect("No window labeled 'main' found");
-
-            app.manage(DbConnection { conn: Mutex::new(None) });
-
-            println!("Initializing config...");
-
-            // Add config to the app state
-            app.manage(get_config());
-
-            println!("Config initialized!");
 
             let app_handle = app.app_handle();
 
@@ -220,31 +233,23 @@ fn main() {
                 match refresh_db_connection(app_handle.state()).await {
                     Ok(_) => println!("Done initializing database connection!"),
                     Err(_) => {
+                        let mut attempts = 0;
                         loop {
+                            if attempts == 10 { break; }
                             match refresh_db_connection(app_handle.state()).await {
                                 Ok(_) => println!("Done initializing database connection!"),
-                                Err(_) => continue,
+                                Err(_) => {
+                                    attempts += 1;
+                                    continue;
+                                }
                             }
                         }
-                    }
-                };
 
-                println!("Initializing book list...");
-
-                let mut books: Vec<DBItem> = Vec::with_capacity(25);
-                match get_all_books().await {
-                    Ok(books_db) => {
-                        for book in books_db {
-                            books.push(book);
+                        if attempts == 10 {
+                            eprintln!("Failed to initialize database connection. Please check your internet connection");
                         }
                     }
-                    Err(_) => (),
                 };
-
-                // Add state to the app
-                app_handle.manage(BookList { list: Mutex::new(books) });
-
-                println!("Done initializing book list!");
 
                 // Close splashscreen and show main window
                 splashscreen_window.close().unwrap();

@@ -51,8 +51,6 @@ export default function Home() {
 
   // Define behavior to do on first render
   useEffect(() => {
-    invoke("print_to_console", { msg: "Entering useEffect" });
-
     const initialize = async () => {
       let userConfig = await invoke<Config>("get_config_from_state");
       let userBooks = await invoke<BookList>("get_booklist_from_state");
@@ -63,11 +61,7 @@ export default function Home() {
     };
 
     initialize().catch((err) => console.error(err));
-
-    invoke("print_to_console", { msg: "State set" });
   }, []);
-
-  console.log(userInfo);
 
   return (
     <>

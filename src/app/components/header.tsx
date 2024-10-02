@@ -8,7 +8,7 @@ import { useAtomValue } from "jotai";
 // CSS imports
 import styles from "../styles/header.module.css";
 
-export default function Header() {
+export default function Header({ inLibrary = false }: { inLibrary: boolean }) {
   const userInfo = useAtomValue(userInfoAtom);
 
   if (userInfo !== null && userInfo.userConfig.username !== "") {
@@ -17,6 +17,46 @@ export default function Header() {
         <Link href="/" className={styles.link}>
           <h2>BookTrack</h2>
         </Link>
+        {inLibrary && (
+          <div className={styles.libraryControls}>
+            <button
+              type="button"
+              className={styles.libraryControlButton}
+              onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                console.log("New List button TODO!");
+              }}
+            >
+              New List
+            </button>
+            <button
+              type="button"
+              className={styles.libraryControlButton}
+              onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                console.log("Sort button TODO!");
+              }}
+            >
+              Sort
+            </button>
+            <button
+              type="button"
+              className={styles.libraryControlButton}
+              onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                console.log("New Book button TODO!");
+              }}
+            >
+              New Book
+            </button>
+          </div>
+        )}
         <div className={styles.headerButtonsContainer}>
           <Link href="/library" className={styles.link}>
             My Library
@@ -28,7 +68,22 @@ export default function Header() {
   } else {
     return (
       <header className={styles.headerContainer}>
-        <h2>BookTrack</h2>
+        <Link href="/" className={styles.link}>
+          <h2>BookTrack</h2>
+        </Link>
+        {inLibrary && (
+          <div className={styles.libraryControls}>
+            <button type="button" className={styles.libraryControlButton}>
+              New List
+            </button>
+            <button type="button" className={styles.libraryControlButton}>
+              Sort
+            </button>
+            <button type="button" className={styles.libraryControlButton}>
+              New Book
+            </button>
+          </div>
+        )}
         <div className={styles.headerButtonsContainer}>
           <Link href="/create-account" className={styles.link}>
             Create Account
