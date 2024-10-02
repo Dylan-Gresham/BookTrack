@@ -6,6 +6,7 @@ export interface BookType {
   image: string;
   totalPages: number;
   pagesRead: number;
+  list: string;
 }
 
 // Defining the BookList type
@@ -21,7 +22,8 @@ export function instanceOfBook(object: any): object is BookType {
     object.author !== undefined &&
     object.image !== undefined &&
     object.totalPages !== undefined &&
-    object.pagesRead !== undefined
+    object.pagesRead !== undefined &&
+    object.list !== undefined
   ) {
     return true;
   } else {
