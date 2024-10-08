@@ -5014,8 +5014,3 @@ name = "zeroize"
 version = "1.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ced3678a2879b30306d323f4542626697a464a97c0a07c9aebf7ebca65cd4dde"
-
-[[patch.unused]]
-name = "sqlite3-parser"
-version = "0.11.0"
-source = "git+https://github.com/LucioFranco/lemon-rs#0ffcb2708727014f091c0c686e864d48ad788919"
