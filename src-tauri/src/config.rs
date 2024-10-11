@@ -16,7 +16,8 @@ pub static DEFAULT_CONFIG: &'static str = indoc! {r#"
     "db_name": "",
     "db_url": "",
     "db_token": "",
-    "theme": "dark"
+    "theme": "dark",
+    "book_lists": ["In Progress", "Planned", "Aside", "Completed", "Dropped"]
 }
 "#};
 
@@ -43,6 +44,7 @@ pub struct Config {
     pub db_url: String,
     pub db_token: String,
     pub theme: String,
+    pub book_lists: Vec<String>,
 }
 
 impl Config {
@@ -78,6 +80,13 @@ impl Config {
             db_url: "".into(),
             db_token: "".into(),
             theme: "dark".into(),
+            book_lists: vec![
+                "In Progress".into(),
+                "Planned".into(),
+                "Aside".into(),
+                "Completed".into(),
+                "Dropped".into(),
+            ],
         }
     }
 }

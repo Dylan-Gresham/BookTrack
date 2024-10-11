@@ -148,6 +148,7 @@ fn update_config(
     db_url: String,
     db_token: String,
     theme: String,
+    book_lists: Vec<String>,
 ) -> Result<String> {
     match config::write_config(Config {
         username,
@@ -155,6 +156,7 @@ fn update_config(
         db_url,
         db_token,
         theme,
+        book_lists,
     }) {
         Ok(_) => Ok(String::from("Wrote new config successfully!")),
         Err(e) => Err(Error { msg: e }),
