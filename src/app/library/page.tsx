@@ -8,7 +8,7 @@ import Header from "../components/header";
 import Book from "../components/book";
 
 // Library imports
-import { userInfoAtom } from "../lib/atoms";
+import { registeredBookListsAtom, userInfoAtom } from "../lib/atoms";
 import { BookType } from "../lib/booklist";
 
 // CSS import
@@ -19,6 +19,7 @@ const CHUNK_SIZE = 5; // Library's row length
 
 export default function Library() {
   const userInfo = useAtomValue(userInfoAtom);
+  const registeredLists = useAtomValue(registeredBookListsAtom);
 
   const userBooks: Array<BookType> = userInfo ? userInfo.userBooks : [];
   let splitUserBooks: Array<Array<BookType>> = [];
