@@ -198,7 +198,10 @@ fn initialize_booklist() -> BookList {
 
     println!("Initializing book list...");
 
-    match tokio::runtime::Runtime::new().expect("Unable to create a Tokio runtime").block_on(get_all_books()) {
+    match tokio::runtime::Runtime::new()
+        .expect("Unable to create a Tokio runtime")
+        .block_on(get_all_books())
+    {
         Ok(books_db) => books.extend(books_db),
         Err(_) => eprintln!("Get all books returned none"),
     };
@@ -207,7 +210,9 @@ fn initialize_booklist() -> BookList {
 
     println!("Done initializing book list!");
 
-    BookList { list: Mutex::new(books) }
+    BookList {
+        list: Mutex::new(books),
+    }
 }
 
 fn main() {
