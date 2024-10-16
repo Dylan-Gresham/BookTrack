@@ -26,7 +26,7 @@ import {
   openUpgrade,
 } from "./lib/openers";
 import { Config } from "./lib/config";
-import { userInfoAtom, UserInfo } from "./lib/atoms";
+import { userInfoAtom, UserInfo, registeredBookListsAtom } from "./lib/atoms";
 import { BookList } from "./lib/booklist";
 
 // Define font
@@ -37,6 +37,7 @@ export default function Home() {
   // Import the userInfo setter function
   //const setUserInfo = useSetAtom(userInfoAtom);
   const [userInfo, setUserInfo] = useAtom(userInfoAtom);
+  const [_, setRegBookList] = useAtom(registeredBookListsAtom);
 
   // Define guides scroller
   const guidesRef = useRef() as MutableRefObject<HTMLDivElement>;
@@ -52,12 +53,14 @@ export default function Home() {
   // Define behavior to do on first render
   useEffect(() => {
     const initialize = async () => {
-      let userConfig = await invoke<Config>("get_config_from_state");
+      let userConfig = await invoke<Config & { book_lists: string[] }>("get_config_from_state");
       let userBooks = await invoke<BookList>("get_booklist_from_state");
 
       let newUserInfo: UserInfo = { userConfig, userBooks };
 
       setUserInfo(newUserInfo);
+
+      setRegBookList(userConfig.book_lists);
     };
 
     initialize().catch((err) => console.error(err));
