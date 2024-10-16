@@ -159,23 +159,10 @@ pub fn write_config(config: Config) -> Result<(), String> {
         config_file.push(CONFIG_DIR);
         config_file.push(CONFIG_FILE);
 
-        let formatted_config = indoc::formatdoc! {r#"
-{{
-    "username": "{username}",
-    "db_name": "{db_name}",
-    "db_url": "{db_url}",
-    "db_token": "{db_token}",
-    "theme": "{theme}"
-}}
-"#,
-        username = config.username,
-        db_name = config.db_name,
-        db_url = config.db_url,
-        db_token = config.db_token,
-        theme = config.theme
-        };
+        let serialized_string =
+            serde_json::to_string_pretty(&config).map_err(|e| format!("error serializing config: {e}"))?;
 
-        match fs::write(config_file, formatted_config) {
+        match fs::write(config_file, serialized_string) {
             Ok(_) => Ok(()),
             Err(e) => Err(e.to_string()),
         }
