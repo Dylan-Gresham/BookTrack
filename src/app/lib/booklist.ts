@@ -4,8 +4,8 @@ export interface BookType {
   title: string;
   author: string;
   image: string;
-  totalPages: number;
-  pagesRead: number;
+  total_pages: number;
+  pages_read: number;
   list: string;
 }
 

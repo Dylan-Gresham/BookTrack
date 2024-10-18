@@ -47,6 +47,7 @@ pub struct DBItem {
     total_pages: u32,
     pages_read: u32,
     image: String,
+    list: String,
 }
 
 // Define state structs
@@ -126,6 +127,7 @@ async fn get_all_books() -> Result<Vec<DBItem>> {
             total_pages: row.get(3)?,
             pages_read: row.get(4)?,
             image: row.get(5)?,
+            list: row.get(6)?,
         };
 
         books.push(book);

@@ -1,0 +1,46 @@
+.bookCardLink {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0.5rem;
+    height: 100%;
+}
+
+.bookCard {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    cursor: inherit;
+    gap: 0.1rem;
+    height: 100%;
+}
+
+.bookCard * {
+    margin: 0;
+    padding: 0;
+    cursor: inherit;
+}
+
+.inProgressBar {
+    background-color: green;
+}
+
+.droppedBar {
+    background-color: orange;
+}
+
+.asideBar {
+    background-color: red;
+}
+
+.defaultBar {
+    background-color: purple;
+}
+
+.bookCard div[role="progressbar"] {
+    width: 100%;
+}
