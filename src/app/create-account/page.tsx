@@ -4,7 +4,7 @@
 import { FormEvent, useState } from "react";
 
 // Jotai import
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 
 // NextJS import
 import Link from "next/link";
@@ -16,12 +16,13 @@ import { invoke } from "@tauri-apps/api/tauri";
 import style from "../styles/createAccount.module.css";
 
 // Library import
-import { UserInfo, userInfoAtom } from "../lib/atoms";
+import { UserInfo, userInfoAtom, registeredBookListsAtom } from "../lib/atoms";
 import { Config } from "../lib/config";
 
 export default function Page() {
   // Define state variables
   const [userInfo, setUserInfo] = useAtom<UserInfo | null>(userInfoAtom);
+  const bookLists = useAtomValue<Array<string>>(registeredBookListsAtom);
   const [startingName, _] = useState<string | null>(
     userInfo ? userInfo.userConfig.username : null,
   );
@@ -178,9 +179,18 @@ export default function Page() {
                   dbUrl: dbURL,
                   dbToken: dbToken,
                   theme: theme,
+                  bookLists: bookLists,
                 })
-                  .then((msg) => console.log(msg))
-                  .catch((errMsg) => console.error(errMsg));
+                  .then((msg) => {
+                    invoke("print_to_console", {
+                      msg: msg,
+                    });
+                  })
+                  .catch((errMsg) => {
+                    invoke("print_to_console", {
+                      msg: errMsg,
+                    });
+                  });
 
                 const linkToHome = document.getElementById("submitButton");
                 linkToHome?.click();
