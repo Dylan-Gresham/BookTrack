@@ -40,11 +40,14 @@ export default function Book({ book }: { book: BookType }) {
         <h6 className={styles.bookAuthor}>{book.author}</h6>
         {showPBar && (
           <ProgressBar
-            completed={book.pagesRead / book.totalPages}
+            completed={(book.pages_read / book.total_pages) * 100.0}
             maxCompleted={100}
             completedClassName={completedClassName}
-            barContainerClassName={styles.ProgressBar}
+            barContainerClassName={styles.progressBar}
           />
+        )}
+        {!showPBar && book.list === "Completed" && (
+          <p style={{ color: "green" }}> ✔ </p>
         )}
       </div>
     </Link>
