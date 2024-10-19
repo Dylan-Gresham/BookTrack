@@ -4,6 +4,7 @@ import { BookType } from "../lib/booklist";
 
 import styles from "../styles/book.module.css";
 import Link from "next/link";
+
 import ProgressBar from "@ramonak/react-progress-bar";
 
 export default function Book({ book }: { book: BookType }) {
