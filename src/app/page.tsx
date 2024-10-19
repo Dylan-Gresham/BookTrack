@@ -53,7 +53,9 @@ export default function Home() {
   // Define behavior to do on first render
   useEffect(() => {
     const initialize = async () => {
-      let userConfig = await invoke<Config & { book_lists: string[] }>("get_config_from_state");
+      let userConfig = await invoke<Config & { book_lists: string[] }>(
+        "get_config_from_state",
+      );
       let userBooks = await invoke<BookList>("get_booklist_from_state");
 
       let newUserInfo: UserInfo = { userConfig, userBooks };
@@ -66,9 +68,11 @@ export default function Home() {
     initialize().catch((err) => console.error(err));
   }, []);
 
+  console.log(userInfo);
+
   return (
     <>
-      <Header />
+      <Header inLibrary={false} />
       {/* Define main home page layout.
        * Eventually there will need to be logic here that will tell
        * it to either render this on launch or the user's library page

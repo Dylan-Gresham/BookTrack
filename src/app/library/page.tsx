@@ -47,7 +47,7 @@ export default function Library() {
         {userBooks.length > 0 &&
           splitUserBooks.map((slice: Array<BookType>) => {
             return (
-              <ul key={i++}>
+              <ul key={i++} className={styles.noBullets}>
                 {slice.map((book) => {
                   return (
                     <li key={book.id}>
