@@ -40,6 +40,7 @@ export default function Library() {
   }
 
   let i = 0;
+  let row = 1;
   return (
     <>
       <Header inLibrary={true} />
@@ -47,7 +48,11 @@ export default function Library() {
         {userBooks.length > 0 &&
           splitUserBooks.map((slice: Array<BookType>) => {
             return (
-              <ul key={i++} className={styles.noBullets}>
+              <ul
+                key={i++}
+                className={styles.noBullets}
+                style={{ gridRow: row++ }}
+              >
                 {slice.map((book) => {
                   return (
                     <li key={book.id}>

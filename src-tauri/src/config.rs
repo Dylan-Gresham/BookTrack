@@ -127,7 +127,7 @@ pub fn read_config() -> Result<String, String> {
                 // Create the config file
                 match fs::write(config_file, DEFAULT_CONFIG) {
                     Ok(_) => {
-                        println!("Defailt config file created");
+                        println!("Default config file created");
                         return Ok(DEFAULT_CONFIG.to_string());
                     }
                     Err(_) => {
@@ -159,8 +159,8 @@ pub fn write_config(config: Config) -> Result<(), String> {
         config_file.push(CONFIG_DIR);
         config_file.push(CONFIG_FILE);
 
-        let serialized_string =
-            serde_json::to_string_pretty(&config).map_err(|e| format!("error serializing config: {e}"))?;
+        let serialized_string = serde_json::to_string_pretty(&config)
+            .map_err(|e| format!("error serializing config: {e}"))?;
 
         match fs::write(config_file, serialized_string) {
             Ok(_) => Ok(()),

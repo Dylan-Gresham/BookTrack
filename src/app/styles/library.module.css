@@ -5,6 +5,7 @@
     grid-template-rows: repeat(5, 1fr);
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     overflow-y: scroll;
+    row-gap: 1.25rem;
 }
 
 .centeredButton {
@@ -21,4 +22,13 @@
     list-style-type: none;
     padding: 0;
     margin: 0;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: flex-start;
+    width: 100%;
+    grid-column: 1 / span 5;
+}
+
+.noBullets > li {
+    width: 100%;
 }
