@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use serde_json;
 
 // Define constants
-pub static CONFIG_FILE: &'static str = "/config.json";
+pub static CONFIG_FILE: &'static str = "/config_temp.json";
 pub static CONFIG_DIR: &'static str = "/booktrack";
 pub static DEFAULT_CONFIG: &'static str = indoc! {r#"
 {
