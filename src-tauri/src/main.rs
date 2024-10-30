@@ -46,6 +46,7 @@ pub struct DBItem {
     author: String,
     total_pages: u32,
     pages_read: u32,
+    synopsis: String,
     image: String,
     list: String,
 }
@@ -116,7 +117,7 @@ async fn get_all_books() -> Result<Vec<DBItem>> {
         Err(msg) => return Err(msg),
     };
 
-    let mut results = db_connection.query("SELECT * FROM books", ()).await?;
+    let mut results = db_connection.query("SELECT * FROM dylan", ()).await?;
 
     let mut books: Vec<DBItem> = Vec::new();
     while let Some(row) = results.next().await? {
@@ -126,8 +127,9 @@ async fn get_all_books() -> Result<Vec<DBItem>> {
             author: row.get(2)?,
             total_pages: row.get(3)?,
             pages_read: row.get(4)?,
-            image: row.get(5)?,
-            list: row.get(6)?,
+            synopsis: row.get(5)?,
+            image: row.get(6)?,
+            list: row.get(7)?,
         };
 
         books.push(book);
