@@ -1,15 +1,19 @@
 .container {
-    width: 50%;
-    height: 60%;
+    width: 90%;
+    height: 85%;
     margin: auto;
     background-color: #CBC0AE;
     overflow: auto;
+    border-radius: 0.5rem;
+    max-width: 700px;
+    max-height: fit-content;
 }
 
 .title {
     margin-left: 0.5rem;
     margin-bottom: 1.5rem;
     font-weight: normal;
+    text-align: center;
 }
 
 .container > form {
@@ -22,7 +26,7 @@
 }
 
 .formGroup {
-    width: 75%;
+    width: 85%;
     display: flex;
     flex-direction: column;
     gap: 0.1rem;
@@ -53,7 +57,7 @@
 
 .textInput {
     border: 1px solid black;
-    border-radius: 6px;
+    border-radius: 0.25rem;
     padding: 0.5rem;
     font-size: 1.25rem;
     color: white;
@@ -73,13 +77,14 @@
 }
 
 .formButtons {
-    margin-top: auto;
+    margin-top: 1rem;
     display: flex;
     gap: 3rem;
 }
 
 .formButtons button {
-    padding: 0.1rem;
+    padding: 0.25rem;
     background-color: #5D707F;
+    color: #F0E5E9;
 }
 
