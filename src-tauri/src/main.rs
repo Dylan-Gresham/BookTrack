@@ -3,6 +3,7 @@
 
 // Define and use the Config module
 mod config;
+mod ml;
 use std::sync::Mutex;
 
 use config::Config;
@@ -219,12 +220,36 @@ fn initialize_booklist() -> BookList {
     }
 }
 
+struct PyLib {
+    code: Mutex<String>,
+}
+
+#[tauri::command]
+fn predict(state: State<PyLib>, book: DBItem) -> f64 {
+    let py_lib = state.code.lock().unwrap();
+
+    let result = ml::predict(&py_lib, book.title, book.author, book.total_pages.try_into().unwrap(), book.synopsis, book.list);
+
+    match result {
+        Ok(r) => r,
+        Err(err) => {
+            eprintln!("{}", err);
+            f64::MIN
+        }
+    }
+}
+
 fn main() {
     tracing_subscriber::fmt::init();
+    let mut py_lib: String = ml::prep_environment();
+    if py_lib == String::from("Error") {
+        py_lib = String::new();
+    }
 
     tauri::Builder::default()
         .manage(initialize_booklist())
         .manage(get_config())
+        .manage(PyLib { code: Mutex::new(py_lib) })
         .manage(DbConnection { conn: Mutex::new(None) })
         .setup(|app: &mut tauri::App| {
             // Get the app and windows
@@ -276,6 +301,7 @@ fn main() {
             refresh_db_connection,
             get_config_from_state,
             get_booklist_from_state,
+            predict,
             print_to_console,
         ])
         .run(tauri::generate_context!())
