@@ -14,6 +14,7 @@ use tauri::{Manager, State};
 // 3rd-party crate imports
 use libsql::{Builder, Connection};
 use serde::{Deserialize, Serialize};
+use reqwest;
 
 // Define the Error struct
 #[derive(Serialize, Debug)]
@@ -37,11 +38,11 @@ where
 
 // Define the struct for Database entries
 
-/// # Booktrack::DBItem
+/// # Booktrack::Book
 ///
 /// Struct used for holding database entries.
 #[derive(Deserialize, Serialize, Debug, Clone)]
-pub struct DBItem {
+pub struct Book {
     id: u64,
     title: String,
     author: String,
@@ -52,6 +53,46 @@ pub struct DBItem {
     list: String,
 }
 
+// Define the struct for Database entries with each field being optional. This is used for making
+// the Google Books API request. Some books may not have all the fields so having them be optional
+// allows for us to make the requests safely.
+
+/// # Booktrack::BookOpt
+///
+/// Struct used for holding database entries.
+#[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct ImageLinks {
+    small_thumbnail: Option<String>,
+    thumbnail: Option<String>,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct VolumeInfo {
+    title: Option<String>,
+    authors: Option<Vec<String>>,
+    page_count: usize,
+    description: Option<String>,
+    image_links: Option<ImageLinks>,
+    language: Option<String>,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct BookOpt {
+    id: Option<String>,
+    volume_info: Option<VolumeInfo>,
+    list: Option<String>,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct GbApiResult {
+    total_items: usize,
+    items: Vec<BookOpt>,
+}
+
 // Define state structs
 
 struct DbConnection {
@@ -60,7 +101,7 @@ struct DbConnection {
 
 #[derive(Serialize, Deserialize)]
 struct BookList {
-    list: Mutex<Vec<DBItem>>,
+    list: Mutex<Vec<Book>>,
 }
 
 // Alias function for readability
@@ -110,9 +151,9 @@ async fn get_db_connection() -> Result<Connection> {
 ///
 /// ## Returns
 ///
-/// Either a Vector of DBItems containing every database entry or an error message.
+/// Either a Vector of Books containing every database entry or an error message.
 #[tauri::command]
-async fn get_all_books() -> Result<Vec<DBItem>> {
+async fn get_all_books() -> Result<Vec<Book>> {
     let db_connection = match get_db_connection().await {
         Ok(conn) => conn,
         Err(msg) => return Err(msg),
@@ -120,9 +161,9 @@ async fn get_all_books() -> Result<Vec<DBItem>> {
 
     let mut results = db_connection.query("SELECT * FROM dylan", ()).await?;
 
-    let mut books: Vec<DBItem> = Vec::new();
+    let mut books: Vec<Book> = Vec::new();
     while let Some(row) = results.next().await? {
-        let book: DBItem = DBItem {
+        let book: Book = Book {
             id: row.get(0)?,
             title: row.get(1)?,
             author: row.get(2)?,
@@ -174,7 +215,7 @@ fn print_to_console(msg: String) {
 }
 
 #[tauri::command]
-fn add_to_booklist(book: DBItem, state: State<BookList>) {
+fn add_to_booklist(book: Book, state: State<BookList>) {
     state.list.lock().unwrap().push(book);
 }
 
@@ -194,12 +235,12 @@ fn get_config_from_state(state: State<Config>) -> Config {
 }
 
 #[tauri::command]
-fn get_booklist_from_state(state: State<BookList>) -> Vec<DBItem> {
+fn get_booklist_from_state(state: State<BookList>) -> Vec<Book> {
     state.list.lock().unwrap().to_vec()
 }
 
 fn initialize_booklist() -> BookList {
-    let mut books: Vec<DBItem> = Vec::with_capacity(25);
+    let mut books: Vec<Book> = Vec::with_capacity(25);
 
     println!("Initializing book list...");
 
@@ -225,7 +266,7 @@ struct PyLib {
 }
 
 #[tauri::command]
-fn predict(state: State<PyLib>, book: DBItem) -> f64 {
+fn predict(state: State<PyLib>, book: Book) -> f64 {
     let py_lib = state.code.lock().unwrap();
 
     let result = ml::predict(&py_lib, book.title, book.author, book.total_pages.try_into().unwrap(), book.synopsis, book.list);
@@ -237,6 +278,75 @@ fn predict(state: State<PyLib>, book: DBItem) -> f64 {
             f64::MIN
         }
     }
+}
+
+#[tauri::command]
+async fn make_gb_api_req(title: Option<String>, author: Option<String>) -> std::result::Result<GbApiResult, String> {
+    let client = reqwest::Client::new();
+
+    let book_title: String;
+    let book_author: String;
+    let book_lang = String::from("en");
+
+    if let Some(titl) = title {
+        book_title = titl;
+    } else {
+        book_title = String::new();
+    }
+
+    if let Some(auth) = author {
+        book_author = auth;
+    } else {
+        book_author = String::new();
+    }
+
+    let url: String;
+    if !book_title.is_empty() && !book_author.is_empty() {
+        url = format!("https://www.googleapis.com/books/v1/volumes?q={}+{}&printType=books", book_title, book_author);
+    } else if !book_title.is_empty() {
+        url = format!("https://www.googleapis.com/books/v1/volumes?q={}&printType=books", book_title);
+    } else if !book_author.is_empty() {
+        url = format!("https://www.googleapis.com/books/v1/volumes?q={}&printType=books", book_author);
+    } else {
+        return Err(String::from("Both title and author are empty. Unable to make API request."));
+    }
+
+    let mut api_result: GbApiResult = match client.get(url).send().await {
+        Ok(res) => {
+            match res.json().await {
+                Ok(api_res) => api_res,
+                Err(api_conv_err) => return Err(api_conv_err.to_string()),
+            }
+        }
+        Err(e) => return Err(e.to_string()),
+    };
+
+    api_result.items = api_result.items.into_iter().filter(|vol|  {
+        if let Some(vol_info) = &vol.volume_info {
+            if let Some(lang) = &vol_info.language {
+                if *lang == book_lang {
+                    if vol_info.page_count > 0 {
+                        true
+                    } else {
+                        false
+                    }
+                } else {
+                    false
+                }
+            } else {
+                false
+            }
+        } else {
+            false
+        }
+    }).collect();
+
+    if api_result.items.len() > 10 {
+        api_result.items = api_result.items[0..10].to_vec();
+        api_result.total_items = 10;
+    }
+
+    Ok(api_result)
 }
 
 fn main() {
@@ -302,6 +412,7 @@ fn main() {
             get_config_from_state,
             get_booklist_from_state,
             predict,
+            make_gb_api_req,
             print_to_console,
         ])
         .run(tauri::generate_context!())

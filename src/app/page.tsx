@@ -27,7 +27,7 @@ import {
 } from "./lib/openers";
 import { Config } from "./lib/config";
 import { userInfoAtom, UserInfo, registeredBookListsAtom } from "./lib/atoms";
-import { BookList, BookType } from "./lib/booklist";
+import { BookList, BookType, GbApiResult } from "./lib/booklist";
 
 // Define font
 const garamond500 = Cormorant_Garamond({ subsets: ["latin"], weight: "500" });
@@ -129,6 +129,24 @@ export default function Home() {
             }}
           >
             Testing Predict Button
+          </button>
+          <button
+            type="button"
+            onClick={async (e: any) => {
+              e.preventDefault();
+              e.stopPropagation();
+
+              let results: GbApiResult | string = await invoke(
+                "make_gb_api_req",
+                {
+                  title: "Red Rising",
+                  author: "Pierce Brown",
+                },
+              );
+              console.log(results);
+            }}
+          >
+            Testing Google Books API Button
           </button>
         </div>
         <div className={styles.typContainer}>

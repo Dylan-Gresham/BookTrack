@@ -10,6 +10,11 @@ export interface BookType {
   list: string;
 }
 
+// Defining the GbApiResult interface
+export interface GbApiResult {
+  volumes: BookType[];
+}
+
 // Defining the BookList type
 export type BookList = BookType[];
 
