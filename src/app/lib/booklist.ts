@@ -4,6 +4,7 @@ export interface BookType {
   title: string;
   author: string;
   image: string;
+  synopsis: string;
   total_pages: number;
   pages_read: number;
   list: string;
@@ -21,6 +22,7 @@ export function instanceOfBook(object: any): object is BookType {
     object.title !== undefined &&
     object.author !== undefined &&
     object.image !== undefined &&
+    object.synopsis !== undefined &&
     object.totalPages !== undefined &&
     object.pagesRead !== undefined &&
     object.list !== undefined

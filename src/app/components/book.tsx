@@ -41,8 +41,10 @@ export default function Book({ book }: { book: BookType }) {
         <h6 className={styles.bookAuthor}>{book.author}</h6>
         {showPBar && (
           <ProgressBar
-            completed={(book.pages_read / book.total_pages) * 100.0}
-            maxCompleted={100}
+            completed={Number(
+              ((book.pages_read / book.total_pages) * 100.0).toFixed(2),
+            )}
+            maxCompleted={100.0}
             completedClassName={completedClassName}
             barContainerClassName={styles.progressBar}
           />
