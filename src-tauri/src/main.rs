@@ -186,7 +186,7 @@ async fn get_all_books() -> Result<Vec<Book>> {
 
 /// # Booktrack::update_config
 ///
-/// Updates the config file with the input parameters.
+/// Updates the config file and cached internal state with the input parameters.
 ///
 /// ## Returns
 ///
@@ -199,18 +199,28 @@ fn update_config(
     db_token: String,
     theme: String,
     book_lists: Vec<String>,
+    state: State<Mutex<Config>>,
 ) -> Result<String> {
-    match config::write_config(Config {
-        username,
-        db_name,
-        db_url,
-        db_token,
-        theme,
-        book_lists,
-    }) {
-        Ok(_) => Ok(String::from("Wrote new config successfully!")),
-        Err(e) => Err(Error { msg: e }),
-    }
+    config::write_config(Config {
+        username: username.clone(),
+        db_name: db_name.clone(),
+        db_url: db_url.clone(),
+        db_token: db_token.clone(),
+        theme: theme.clone(),
+        book_lists: book_lists.clone(),
+    })
+    .map_err(|e| Error { msg: e })?;
+
+    let mut state = state.lock()?;
+
+    state.username = username;
+    state.db_name = db_name;
+    state.db_url = db_url;
+    state.db_token = db_token;
+    state.theme = theme;
+    state.book_lists = book_lists;
+
+    Ok("Wrote new config successfully!".into())
 }
 
 #[tauri::command]
@@ -252,8 +262,8 @@ async fn refresh_db_connection(state: State<'_, DbConnection>) -> Result<()> {
 }
 
 #[tauri::command]
-fn get_config_from_state(state: State<Config>) -> Config {
-    state.inner().clone()
+fn get_config_from_state(state: State<Mutex<Config>>) -> Config {
+    state.inner().lock().unwrap().clone()
 }
 
 #[tauri::command]
@@ -380,9 +390,9 @@ fn main() {
 
     tauri::Builder::default()
         .manage(initialize_booklist())
-        .manage(get_config())
         .manage(PyLib { code: Mutex::new(py_lib) })
         .manage(DbConnection { conn: lock::Mutex::new(None) })
+        .manage(Mutex::new(get_config()))
         .setup(|app: &mut tauri::App| {
             // Get the app and windows
             let splashscreen_window = app
