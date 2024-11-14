@@ -7,6 +7,14 @@ export interface Config {
   theme: "light" | "dark";
 }
 
+export const defaultConfig: Config = {
+  username: "",
+  dbName: "",
+  dbUrl: "",
+  dbToken: "",
+  theme: "dark",
+};
+
 /**
  * Checks if the object is an instance of the Config interface
  */

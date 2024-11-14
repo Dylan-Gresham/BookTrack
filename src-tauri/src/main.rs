@@ -12,8 +12,9 @@ use config::Config;
 use tauri::{Manager, State};
 
 // 3rd-party crate imports
-use libsql::{Builder, Connection};
+use libsql::{Builder, Connection, params};
 use serde::{Deserialize, Serialize};
+use futures::lock;
 use reqwest;
 
 // Define the Error struct
@@ -96,8 +97,11 @@ pub struct GbApiResult {
 // Define state structs
 
 struct DbConnection {
-    conn: Mutex<Option<libsql::Connection>>,
+    conn: lock::Mutex<Option<libsql::Connection>>,
 }
+
+unsafe impl Send for DbConnection {}
+unsafe impl Sync for DbConnection {}
 
 #[derive(Serialize, Deserialize)]
 struct BookList {
@@ -220,8 +224,26 @@ fn add_to_booklist(book: Book, state: State<BookList>) {
 }
 
 #[tauri::command]
+async fn update_db(conn: State<'_, DbConnection>, book_list: State<'_, BookList>, book: Book) -> std::result::Result<(), ()> {
+    add_to_booklist(book.clone(), book_list);
+
+    match &mut *conn.conn.lock().await {
+        Some(connection) => {
+            match connection.execute(
+                "INSERT INTO books (id, title, author, totalPages, pagesRead, synopsis, link, list, label) VALUES ()",
+                params![book.id, book.title, book.author, book.total_pages, book.pages_read, book.synopsis, book.image, book.list, 1],
+            ).await {
+                Ok(_) => Ok(()),
+                Err(_) => Err(())
+            }
+        }
+        None => Err(()),
+    }
+}
+
+#[tauri::command]
 async fn refresh_db_connection(state: State<'_, DbConnection>) -> Result<()> {
-    *state.conn.lock().unwrap() = match get_db_connection().await {
+    *state.conn.lock().await = match get_db_connection().await {
         Ok(c) => Some(c),
         Err(_) => None,
     };
@@ -343,8 +365,8 @@ async fn make_gb_api_req(title: Option<String>, author: Option<String>) -> std::
 
     if api_result.items.len() > 10 {
         api_result.items = api_result.items[0..10].to_vec();
-        api_result.total_items = 10;
     }
+    api_result.total_items = api_result.items.len();
 
     Ok(api_result)
 }
@@ -360,7 +382,7 @@ fn main() {
         .manage(initialize_booklist())
         .manage(get_config())
         .manage(PyLib { code: Mutex::new(py_lib) })
-        .manage(DbConnection { conn: Mutex::new(None) })
+        .manage(DbConnection { conn: lock::Mutex::new(None) })
         .setup(|app: &mut tauri::App| {
             // Get the app and windows
             let splashscreen_window = app
@@ -408,6 +430,7 @@ fn main() {
             get_all_books,
             update_config,
             add_to_booklist,
+            update_db,
             refresh_db_connection,
             get_config_from_state,
             get_booklist_from_state,
