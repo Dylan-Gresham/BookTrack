@@ -10,19 +10,19 @@ import ProgressBar from "@ramonak/react-progress-bar";
 export default function Book({ book }: { book: BookType }) {
   let showPBar =
     book.list === "Completed" || book.list === "Planned" ? false : true;
-  let completedClassName = undefined;
+  let barColor = undefined;
   switch (book.list) {
     case "In Progress":
-      completedClassName = styles.inProgressBar;
+      barColor = "#36c22f";
       break;
     case "Aside":
-      completedClassName = styles.asideBar;
+      barColor = "#d4691e";
       break;
     case "Dropped":
-      completedClassName = styles.droppedBar;
+      barColor = "#ba2a25";
       break;
     default:
-      completedClassName = styles.defaultBar;
+      barColor = "#6a1b9a";
       break;
   }
 
@@ -45,8 +45,9 @@ export default function Book({ book }: { book: BookType }) {
               ((book.pages_read / book.total_pages) * 100.0).toFixed(2),
             )}
             maxCompleted={100.0}
-            completedClassName={completedClassName}
-            barContainerClassName={styles.progressBar}
+            labelAlignment="left"
+            labelColor="#000000"
+            bgColor={barColor}
           />
         )}
         {!showPBar && book.list === "Completed" && (
