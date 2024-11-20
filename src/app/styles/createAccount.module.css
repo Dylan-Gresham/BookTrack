@@ -7,6 +7,7 @@
     border-radius: 0.5rem;
     max-width: 700px;
     max-height: fit-content;
+    min-width: 337px; /* Don't shrink the container for anything smaller than an iPhone SE */
 }
 
 .title {
