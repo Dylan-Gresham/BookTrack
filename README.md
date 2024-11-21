@@ -1,7 +1,7 @@
 # BookTrack
 
 A book tracking application made by
-[Dylan Gresham](https://www.github.com/Dylan-Gresham), [Brenek Harrison](https://github.com/BrenekH), and [Francisco Murguia](https://github.com/FranciscoMurguia) using Tauri & Next.js.
+[Dylan Gresham](https://www.github.com/Dylan-Gresham) and the [Contributors](#Contributors) using Tauri & Next.js.
 
 # Getting Started
 
@@ -38,6 +38,17 @@ On launch, a splashscreen with a simple loading spinner and message will appear.
 Once the splashscreen closes, you can view the home page of Booktrack. The home page contains a header with the title of the app and a "Create Account" button. Below the header is a brief introduction to Booktrack, what it is, and what it's used for. Below the welcome section, there's a button to take you to the Getting Started section (the next section). The Getting Started section has buttons that will open links in your machine's default web browser. The links that are opened will eventually contain guides written in Markdown that teach users how to setup the app, upgrade/update the app and the underlying database (if using Turso), how to manage books/lists/database, and how to retrieve all the information that's contained within your app's database. Below the getting starteed section is the features section. The features section contains more links to eventual Markdown guides that will provide a brief introduction to each of the core functionalities of Booktrack. Finally there's the footer which shows the copyright for creation of the app and a link to the project's GitHub repository.
 
 When the create account button is clicked, it opens a (very ugly) "account" creation page (route). This page contains fields for your username, database name, database URL, database token, and the app's theme. There's also a create account button and a cancel button at the bottom. The create account button will create a file in the `$CONFIG/booktrack` directory called `config.json` which will contain the data that you input. The cancel button will reset the username field (global state variable) to it's value when you first clicked the create account button from the home page. Both buttons will bring you back to the home page after clicking them, except for in the case where you try to create an account without filling in all the information.
+
+# Contributors
+
+## Core Developers
+
+- [Dylan Gresham](https://github.com/Dylan-Gresham)
+
+Special thanks to these guys for all their help throughout the lifetime of BookTrack. From start to finish I've been bouncing ideas off of these two and getting feedback from them.
+
+- [Brenek Harrison](https://github.com/BrenekH)
+- [Francisco Murguia](https://github.com/FranciscoMurguia)
 
 # Scrum Linter
 

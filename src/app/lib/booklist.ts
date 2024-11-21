@@ -7,7 +7,19 @@ export interface BookType {
   total_pages: number;
   pages_read: number;
   list: string;
+  synopsis: string;
 }
+
+export const DEFAULT_BOOK: BookType = {
+  id: 0,
+  title: "",
+  author: "",
+  image: "",
+  total_pages: 0,
+  pages_read: 0,
+  list: "",
+  synopsis: "",
+};
 
 // Defining the BookList type
 export type BookList = BookType[];
@@ -23,7 +35,8 @@ export function instanceOfBook(object: any): object is BookType {
     object.image !== undefined &&
     object.totalPages !== undefined &&
     object.pagesRead !== undefined &&
-    object.list !== undefined
+    object.list !== undefined &&
+    object.synopsis !== undefined
   ) {
     return true;
   } else {

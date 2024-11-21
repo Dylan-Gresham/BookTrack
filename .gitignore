@@ -27,3 +27,6 @@ target
 target/*
 .next
 .next/*
+
+.env
+.env/*
