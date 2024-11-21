@@ -1,7 +1,7 @@
 # BookTrack
 
 A book tracking application made by
-[Dylan Gresham](https://www.github.com/Dylan-Gresham), [Brenek Harrison](https://github.com/BrenekH), and [Francisco Murguia](https://github.com/FranciscoMurguia) using Tauri & Next.js.
+[Dylan Gresham](https://www.github.com/Dylan-Gresham) and the [Contributors](#Contributors) using Tauri & Next.js.
 
 # Getting Started
 
