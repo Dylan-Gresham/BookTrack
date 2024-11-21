@@ -143,7 +143,7 @@ export default function Page() {
                 await addBook(newBook);
               }}
             >
-              Save Changes
+              Add Book
             </button>
           </Link>
         </div>
