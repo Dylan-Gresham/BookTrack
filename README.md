@@ -39,6 +39,17 @@ Once the splashscreen closes, you can view the home page of Booktrack. The home 
 
 When the create account button is clicked, it opens a (very ugly) "account" creation page (route). This page contains fields for your username, database name, database URL, database token, and the app's theme. There's also a create account button and a cancel button at the bottom. The create account button will create a file in the `$CONFIG/booktrack` directory called `config.json` which will contain the data that you input. The cancel button will reset the username field (global state variable) to it's value when you first clicked the create account button from the home page. Both buttons will bring you back to the home page after clicking them, except for in the case where you try to create an account without filling in all the information.
 
+# Contributors
+
+## Core Developers
+
+- [Dylan Gresham](https://github.com/Dylan-Gresham)
+
+Special thanks to these guys for all their help throughout the lifetime of BookTrack. From start to finish I've been bouncing ideas off of these two and getting feedback from them.
+
+- [Brenek Harrison](https://github.com/BrenekH)
+- [Francisco Murguia](https://github.com/FranciscoMurguia)
+
 # Scrum Linter
 
 [Click here to go to the scrum linter page](https://scrumlinter.boisestate.edu/CS471F24ScrumLinterReports/CS471-F24-Team16_zJfC6vmp4zDCxbu7BAJvZEdKreMdp17gk36Q6Pj2/)
