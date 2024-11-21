@@ -43,18 +43,11 @@ export default function Header({ inLibrary = false }: { inLibrary: boolean }) {
             >
               Sort
             </button>
-            <button
-              type="button"
-              className={styles.libraryControlButton}
-              onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                e.preventDefault();
-                e.stopPropagation();
-
-                console.log("New Book button TODO!");
-              }}
-            >
-              New Book
-            </button>
+            <Link href="/library/add-book">
+              <button type="button" className={styles.libraryControlButton}>
+                New Book
+              </button>
+            </Link>
           </div>
         )}
         <div className={styles.headerButtonsContainer}>

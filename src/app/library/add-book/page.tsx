@@ -4,41 +4,37 @@
 import Link from "next/link";
 
 // React imports
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 
 // Tauri imports
 import { invoke } from "@tauri-apps/api";
 
 // Jotai imports
-import {
-  clickedBookAtom,
-  registeredBookListsAtom,
-  userInfoAtom,
-} from "@/app/lib/atoms";
+import { registeredBookListsAtom, userInfoAtom } from "@/app/lib/atoms";
 import { useAtom, useAtomValue } from "jotai";
 
 // Library imports
-import { BookType, DEFAULT_BOOK } from "../lib/booklist";
+import { BookType, DEFAULT_BOOK } from "../../lib/booklist";
 
 // Third party imporst
 import { Dropdown } from "primereact/dropdown";
 
 // Style imports
 import styles from "@/app/styles/editBook.module.css";
-import { classNames } from "primereact/utils";
 
 export default function Page() {
-  const clickedBook = useAtomValue(clickedBookAtom);
   const lists = useAtomValue(registeredBookListsAtom);
-  const [newBook, setNewBook] = useState<BookType>(
-    clickedBook !== undefined ? clickedBook : DEFAULT_BOOK,
-  );
+  const [newBook, setNewBook] = useState<BookType>(DEFAULT_BOOK);
   const [userInfo, setUserInfo] = useAtom(userInfoAtom);
 
-  async function updateBook(newBook: BookType) {
-    if (userInfo && clickedBook) {
-      let newUserBooks = userInfo.userBooks;
-      newUserBooks[newUserBooks.indexOf(clickedBook)] = newBook;
+  async function addBook(newBook: BookType) {
+    if (userInfo) {
+      let newUserBooks: Array<BookType> = userInfo.userBooks;
+
+      newUserBooks.push({
+        ...newBook,
+        id: Math.max(...userInfo.userBooks.map((book) => book.id)) + 1,
+      });
 
       await invoke("update_db", { book: newBook });
 
@@ -48,7 +44,7 @@ export default function Page() {
 
   return (
     <div className={styles.container}>
-      <h1>Edit {clickedBook !== undefined ? clickedBook.title : "Book"}</h1>
+      <h1>Add a New Book</h1>
       <form className={styles.formContainer}>
         <div className={styles.inputContainer}>
           <label className={styles.label} htmlFor="title">
@@ -57,7 +53,11 @@ export default function Page() {
           <input
             type="text"
             className={styles.textInput}
-            value={clickedBook?.title}
+            value={newBook.title}
+            placeholder="The Way of Kings"
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              setNewBook({ ...newBook, title: e.target.value });
+            }}
             name="title"
           />
         </div>
@@ -68,7 +68,11 @@ export default function Page() {
           <input
             type="text"
             className={styles.textInput}
-            value={clickedBook?.author}
+            value={newBook.author}
+            placeholder="Brandon Sanderson"
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              setNewBook({ ...newBook, author: e.target.value });
+            }}
             name="author"
           />
         </div>
@@ -78,15 +82,27 @@ export default function Page() {
           </label>
           <input
             type="number"
-            value={clickedBook?.total_pages}
+            value={newBook.total_pages}
             name="totPages"
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              setNewBook({ ...newBook, total_pages: Number(e.target.value) });
+            }}
+            placeholder="0"
           />
         </div>
         <div className={styles.inputContainer}>
           <label className={styles.label} htmlFor="pagRead">
             Pages Read:
           </label>
-          <input type="number" value={clickedBook?.pages_read} name="pagRead" />
+          <input
+            type="number"
+            value={newBook.pages_read}
+            name="pagRead"
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              setNewBook({ ...newBook, pages_read: Number(e.target.value) });
+            }}
+            placeholder="0"
+          />
         </div>
         <div className={styles.inputContainer}>
           <label className={styles.label} htmlFor="covImg">
@@ -95,7 +111,11 @@ export default function Page() {
           <input
             type="url"
             className={styles.textInput}
-            value={clickedBook?.image}
+            value={newBook.image}
+            placeholder="https://shorturl.at/LWvmJ"
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              setNewBook({ ...newBook, image: e.target.value });
+            }}
             name="covImg"
           />
         </div>
@@ -104,7 +124,7 @@ export default function Page() {
             List:
           </label>
           <Dropdown
-            value={clickedBook?.list}
+            value={newBook.list}
             onChange={(e) => setNewBook({ ...newBook, list: e.value })}
             options={lists}
             optionLabel="List"
@@ -119,8 +139,8 @@ export default function Page() {
           <Link href="/library">
             <button
               type="button"
-              onClick={async (_: any) => {
-                await updateBook(newBook);
+              onClick={async (_) => {
+                await addBook(newBook);
               }}
             >
               Save Changes
