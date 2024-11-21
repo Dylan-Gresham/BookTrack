@@ -49,33 +49,65 @@ export default function Page() {
     <div className={styles.container}>
       <form className={styles.formContainer}>
         <div className={styles.inputContainer}>
-          <label>Title:</label>
-          <input type="text" value={clickedBook?.title} />
+          <label className={styles.label} htmlFor="title">
+            Title:
+          </label>
+          <input
+            type="text"
+            className={styles.textInput}
+            value={clickedBook?.title}
+            name="title"
+          />
         </div>
         <div className={styles.inputContainer}>
-          <label>Author:</label>
-          <input type="text" value={clickedBook?.author} />
+          <label className={styles.label} htmlFor="author">
+            Author:
+          </label>
+          <input
+            type="text"
+            className={styles.textInput}
+            value={clickedBook?.author}
+            name="author"
+          />
         </div>
         <div className={styles.inputContainer}>
-          <label>Total Pages:</label>
-          <input type="number" value={clickedBook?.total_pages} />
+          <label className={styles.label} htmlFor="totPages">
+            Total Pages:
+          </label>
+          <input
+            type="number"
+            value={clickedBook?.total_pages}
+            name="totPages"
+          />
         </div>
         <div className={styles.inputContainer}>
-          <label>Pages Read:</label>
-          <input type="number" value={clickedBook?.pages_read} />
+          <label className={styles.label} htmlFor="pagRead">
+            Pages Read:
+          </label>
+          <input type="number" value={clickedBook?.pages_read} name="pagRead" />
         </div>
         <div className={styles.inputContainer}>
-          <label>Cover Image:</label>
-          <input type="url" value={clickedBook?.image} />
+          <label className={styles.label} htmlFor="covImg">
+            Cover Image:
+          </label>
+          <input
+            type="url"
+            className={styles.textInput}
+            value={clickedBook?.image}
+            name="covImg"
+          />
         </div>
         <div className={styles.inputContainer}>
-          <label>List:</label>
+          <label className={styles.label} htmlFor="list">
+            List:
+          </label>
           <Dropdown
             value={clickedBook?.list}
             onChange={(e) => setNewBook({ ...newBook, list: e.value })}
             options={lists}
             optionLabel="List"
             placeholder="Select a list"
+            name="name"
           />
         </div>
         <div className={styles.buttonContainer}>
