@@ -228,21 +228,17 @@ fn print_to_console(msg: String) {
 async fn make_gb_api_req(title: Option<String>, author: Option<String>) -> std::result::Result<GbApiResult, String> {
     let client = reqwest::Client::new();
 
-    let book_title: String;
-    let book_author: String;
     let book_lang = String::from("en");
 
-    if let Some(titl) = title {
-        book_title = titl;
-    } else {
-        book_title = String::new();
-    }
+    let book_title = match title {
+        Some(t) => t,
+        None => String::new(),
+    };
 
-    if let Some(auth) = author {
-        book_author = auth;
-    } else {
-        book_author = String::new();
-    }
+    let book_author = match author {
+        Some(a) => a,
+        None => String::new(),
+    };
 
     let url: String;
     if !book_title.is_empty() && !book_author.is_empty() {
