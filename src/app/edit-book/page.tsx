@@ -1,11 +1,9 @@
 import Link from "next/link";
+import { clickedBookAtom } from "@/app/lib/atoms";
+import { useAtomValue } from "jotai";
 
 export default function Page() {
-  return (
-    <>
-      <h1>TODO!</h1>
-      <Link href="/">Home</Link>
-      <Link href="/library">Back to Library</Link>
-    </>
-  );
+  const clickedBook = useAtomValue(clickedBookAtom);
+
+  return <div></div>;
 }
