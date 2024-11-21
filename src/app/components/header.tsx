@@ -2,7 +2,7 @@
 import Link from "next/link";
 
 // Jotai imports
-import { userInfoAtom } from "../lib/atoms";
+import { userInfoAtom, librarySortAtom } from "../lib/atoms";
 import { useAtomValue } from "jotai";
 
 // CSS imports
@@ -31,6 +31,14 @@ export default function Header({ inLibrary = false }: { inLibrary: boolean }) {
             >
               New List
             </button>
+
+            <select name="library-sort-by" id="library-sort-by">
+              <option value="no-sort">No Sort</option>
+              <option value="title">Title</option>
+              <option value="author">Author</option>
+              <option value="page-count">Page Count</option>
+            </select>
+
             <button
               type="button"
               className={styles.libraryControlButton}
@@ -43,6 +51,7 @@ export default function Header({ inLibrary = false }: { inLibrary: boolean }) {
             >
               Sort
             </button>
+
             <button
               type="button"
               className={styles.libraryControlButton}
