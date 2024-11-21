@@ -9,6 +9,16 @@ export interface BookType {
   list: string;
 }
 
+export const DEFAULT_BOOK: BookType = {
+  id: 0,
+  title: "",
+  author: "",
+  image: "",
+  total_pages: 0,
+  pages_read: 0,
+  list: "",
+};
+
 // Defining the BookList type
 export type BookList = BookType[];
 
