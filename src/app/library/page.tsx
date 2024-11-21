@@ -22,10 +22,10 @@ export default function Library() {
   const registeredLists = useAtomValue(registeredBookListsAtom);
   const librarySort = useAtomValue(librarySortAtom);
 
-  const userBooks: Array<BookType> = userInfo ? userInfo.userBooks : [];
+  let userBooks: Array<BookType> = userInfo ? userInfo.userBooks : [];
 
   if (librarySort.sortBy !== "default") {
-    userBooks.sort((a, b): number => {
+    userBooks = userBooks.toSorted((a, b): number => {
       let sortValue = 0;
 
       switch (librarySort.sortBy) {
