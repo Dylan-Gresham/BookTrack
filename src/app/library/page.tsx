@@ -8,7 +8,7 @@ import Header from "../components/header";
 import Book from "../components/book";
 
 // Library imports
-import { registeredBookListsAtom, userInfoAtom } from "../lib/atoms";
+import { registeredBookListsAtom, userInfoAtom, librarySortAtom } from "../lib/atoms";
 import { BookType } from "../lib/booklist";
 
 // CSS import
@@ -20,8 +20,30 @@ const CHUNK_SIZE = 5; // Library's row length
 export default function Library() {
   const userInfo = useAtomValue(userInfoAtom);
   const registeredLists = useAtomValue(registeredBookListsAtom);
+  const librarySort = useAtomValue(librarySortAtom);
 
   const userBooks: Array<BookType> = userInfo ? userInfo.userBooks : [];
+
+  if (librarySort.sortBy !== "default") {
+    userBooks.sort((a, b): number => {
+      let sortValue = 0;
+
+      switch (librarySort.sortBy) {
+        case "title":
+          sortValue = a.title.localeCompare(b.title);
+          break;
+        case "author":
+          sortValue = a.author.localeCompare(b.author);
+          break;
+        case "pageCount":
+          sortValue = b.total_pages - a.total_pages;
+          break;
+      }
+
+      return librarySort.order === "descending" ? sortValue : sortValue * -1;
+    });
+  }
+
   let splitUserBooks: Array<Array<BookType>> = [];
 
   let chunk: Array<BookType> = [];

@@ -36,13 +36,7 @@ export default function Header({ inLibrary = false }: { inLibrary: boolean }) {
             <select name="library-sort-by" id="library-sort-by" value={librarySortValue.sortBy} onChange={(e) => {
               const newSortKey = e.target.value as "default" | "title" | "author" | "pageCount";
 
-              if (newSortKey === librarySortValue.sortBy) {
-                if (librarySortValue.order === "descending") {
-                  librarySortValue.order = "ascending";
-                } else {
-                  librarySortValue.order = "descending";
-                }
-              } else {
+              if (newSortKey !== librarySortValue.sortBy) {
                 librarySortValue.sortBy = newSortKey;
                 librarySortValue.order = "descending";
               }
@@ -54,6 +48,25 @@ export default function Header({ inLibrary = false }: { inLibrary: boolean }) {
               <option value="author">Author</option>
               <option value="pageCount">Page Count</option>
             </select>
+
+            <button
+              type="button"
+              className={styles.libraryControlButton}
+              onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (librarySortValue.order === "descending") {
+                  librarySortValue.order = "ascending";
+                } else {
+                  librarySortValue.order = "descending";
+                }
+
+                setLibrarySort({...librarySortValue, order: librarySortValue.order});
+              }}
+            >
+              {librarySortValue.order === "descending" ? "↓" : "↑"}
+            </button>
 
             <button
               type="button"
