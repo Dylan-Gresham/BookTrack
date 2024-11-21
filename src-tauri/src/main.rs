@@ -71,7 +71,7 @@ pub struct ImageLinks {
 pub struct VolumeInfo {
     title: Option<String>,
     authors: Option<Vec<String>>,
-    page_count: usize,
+    page_count: Option<usize>,
     description: Option<String>,
     image_links: Option<ImageLinks>,
     language: Option<String>,
@@ -254,7 +254,11 @@ async fn make_gb_api_req(title: Option<String>, author: Option<String>) -> std::
         if let Some(vol_info) = &vol.volume_info {
             if let Some(lang) = &vol_info.language {
                 if *lang == book_lang {
-                    vol_info.page_count > 0
+                    if let Some(page_count) = vol_info.page_count {
+                        page_count > 0
+                    } else {
+                        false
+                    }
                 } else {
                     false
                 }
@@ -325,10 +329,44 @@ async fn complete_book(book: &mut Book) {
                 }
 
                 if book.total_pages == 0 {
-                    book.total_pages = info.page_count as u32;
+                    book.total_pages = info.page_count.unwrap_or_default() as u32;
                 }
             }
             None => (),
+        }
+    }
+}
+
+fn update_booklist(book: Book, state: State<BookList>) {
+    let mut list = state.list.lock().unwrap();
+    let old_book: Book = std::mem::replace(&mut list[book.id as usize], book.clone());
+
+    println!("Replaced {old_book:?} with {book:?}");
+}
+
+#[tauri::command]
+async fn update_book_in_db(conn: State<'_, DbConnection>, book_list: State<'_, BookList>, book: Book) -> std::result::Result<(), ()> {
+    update_booklist(book.clone(), book_list);
+
+    match &mut *conn.conn.lock().await {
+        Some(connection) => {
+            match connection.execute(
+                "UPDATE dylan SET title = ?1, author = ?2, totalPages = ?3, pagesRead = ?4, link = ?5, list = ?6 WHERE id = ?7",
+                params![book.title, book.author, book.total_pages, book.pages_read, book.image, book.list, book.id],
+            ).await {
+                Ok(_) => {
+                    println!("Database successfully updated.");
+                    Ok(())
+                }
+                Err(e) => {
+                    eprintln!("Erorr executing the SQL query.\nError\n\t{e}");
+                    Err(())
+                }
+            }
+        }
+        None => {
+            eprintln!("No database connection exists!");
+            Err(())
         }
     }
 }
@@ -341,7 +379,7 @@ async fn update_db(conn: State<'_, DbConnection>, book_list: State<'_, BookList>
     match &mut *conn.conn.lock().await {
         Some(connection) => {
             match connection.execute(
-                "INSERT INTO books (id, title, author, totalPages, pagesRead, synopsis, link, list, label) VALUES ()",
+                "INSERT INTO dylan (id, title, author, totalPages, pagesRead, synopsis, link, list, label) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
                 params![book.id, book.title, book.author, book.total_pages, book.pages_read, book.synopsis, book.image, book.list, 1],
             ).await {
                 Ok(_) => {
@@ -463,6 +501,7 @@ fn main() {
             update_config,
             add_to_booklist,
             update_db,
+            update_book_in_db,
             refresh_db_connection,
             get_config_from_state,
             get_booklist_from_state,

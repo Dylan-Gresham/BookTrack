@@ -3,7 +3,7 @@ import { atom } from "jotai";
 
 // Libary imports
 import { Config } from "./config";
-import { BookList } from "./booklist";
+import { BookList, BookType } from "./booklist";
 
 export interface UserInfo {
   userConfig: Config;
@@ -14,3 +14,5 @@ export interface UserInfo {
 export const userInfoAtom = atom<UserInfo | null>(null);
 
 export const registeredBookListsAtom = atom<string[]>([]);
+
+export const clickedBookAtom = atom<BookType | undefined>(undefined);

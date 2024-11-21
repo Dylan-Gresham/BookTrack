@@ -10,15 +10,11 @@ import { ChangeEvent, useState } from "react";
 import { invoke } from "@tauri-apps/api";
 
 // Jotai imports
-import {
-  clickedBookAtom,
-  registeredBookListsAtom,
-  userInfoAtom,
-} from "@/app/lib/atoms";
+import { registeredBookListsAtom, userInfoAtom } from "@/app/lib/atoms";
 import { useAtom, useAtomValue } from "jotai";
 
 // Library imports
-import { BookType, DEFAULT_BOOK } from "../lib/booklist";
+import { BookType, DEFAULT_BOOK } from "../../lib/booklist";
 
 // Third party imporst
 import { Dropdown } from "primereact/dropdown";
@@ -27,19 +23,20 @@ import { Dropdown } from "primereact/dropdown";
 import styles from "@/app/styles/editBook.module.css";
 
 export default function Page() {
-  const clickedBook = useAtomValue(clickedBookAtom);
   const lists = useAtomValue(registeredBookListsAtom);
-  const [newBook, setNewBook] = useState<BookType>(
-    clickedBook !== undefined ? clickedBook : DEFAULT_BOOK,
-  );
+  const [newBook, setNewBook] = useState<BookType>(DEFAULT_BOOK);
   const [userInfo, setUserInfo] = useAtom(userInfoAtom);
 
-  async function updateBook(newBook: BookType) {
-    if (userInfo && clickedBook) {
-      let newUserBooks = userInfo.userBooks;
-      newUserBooks[newUserBooks.indexOf(clickedBook)] = newBook;
+  async function addBook(newBook: BookType) {
+    if (userInfo) {
+      let newUserBooks: Array<BookType> = userInfo.userBooks;
 
-      await invoke("update_book_in_db", { book: newBook });
+      newUserBooks.push({
+        ...newBook,
+        id: Math.max(...userInfo.userBooks.map((book) => book.id)) + 1,
+      });
+
+      await invoke("update_db", { book: newBook });
 
       setUserInfo({ ...userInfo, userBooks: newUserBooks });
     }
@@ -47,7 +44,7 @@ export default function Page() {
 
   return (
     <div className={styles.container}>
-      <h1>Edit {clickedBook !== undefined ? clickedBook.title : "Book"}</h1>
+      <h1>Add a New Book</h1>
       <form className={styles.formContainer}>
         <div className={styles.inputContainer}>
           <label className={styles.label} htmlFor="title">
@@ -57,6 +54,7 @@ export default function Page() {
             type="text"
             className={styles.textInput}
             value={newBook.title}
+            placeholder="The Way of Kings"
             onChange={(e: ChangeEvent<HTMLInputElement>) => {
               setNewBook({ ...newBook, title: e.target.value });
             }}
@@ -71,6 +69,7 @@ export default function Page() {
             type="text"
             className={styles.textInput}
             value={newBook.author}
+            placeholder="Brandon Sanderson"
             onChange={(e: ChangeEvent<HTMLInputElement>) => {
               setNewBook({ ...newBook, author: e.target.value });
             }}
@@ -84,10 +83,11 @@ export default function Page() {
           <input
             type="number"
             value={newBook.total_pages}
+            name="totPages"
             onChange={(e: ChangeEvent<HTMLInputElement>) => {
               setNewBook({ ...newBook, total_pages: Number(e.target.value) });
             }}
-            name="totPages"
+            placeholder="0"
           />
         </div>
         <div className={styles.inputContainer}>
@@ -101,6 +101,7 @@ export default function Page() {
             onChange={(e: ChangeEvent<HTMLInputElement>) => {
               setNewBook({ ...newBook, pages_read: Number(e.target.value) });
             }}
+            placeholder="0"
           />
         </div>
         <div className={styles.inputContainer}>
@@ -111,6 +112,7 @@ export default function Page() {
             type="url"
             className={styles.textInput}
             value={newBook.image}
+            placeholder="https://shorturl.at/LWvmJ"
             onChange={(e: ChangeEvent<HTMLInputElement>) => {
               setNewBook({ ...newBook, image: e.target.value });
             }}
@@ -137,11 +139,11 @@ export default function Page() {
           <Link href="/library">
             <button
               type="button"
-              onClick={async (_: any) => {
-                await updateBook(newBook);
+              onClick={async (_) => {
+                await addBook(newBook);
               }}
             >
-              Save Changes
+              Add Book
             </button>
           </Link>
         </div>

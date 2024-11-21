@@ -1,0 +1,81 @@
+.container {
+    width: 90%;
+    height: 85%;
+    margin: auto;
+    background-color: #CBC0AE;
+    overflow: auto;
+    border-radius: 0.5rem;
+    max-width: 700px;
+    max-height: fit-content;
+}
+
+.container > .formContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.inputContainer {
+    width: 85%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.textInput {
+    border: 1px solid black;
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+    font-size: 1.25rem;
+    color: white;
+    background-color: #5D707F;
+}
+
+.label,
+.radioInput,
+.textInput {
+    cursor: pointer;
+}
+
+.radioInput,
+.textInput {
+    appearance: none;
+}
+
+.textInput {
+    border: 1px solid black;
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+    font-size: 1.25rem;
+    color: white;
+    background-color: #5D707F;
+}
+
+.radioInput {
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    border: 2px solid black;
+    transition: 0.2s all linear;
+}
+
+.radioInput:checked {
+    border: 6px solid #5D707F;
+}
+
+.buttonContainer {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 3rem;
+}
+
+.buttonContainer button {
+    padding: 0.25rem;
+    background-color: #5D707F;
+    color: #F0E5E9;
+}
+

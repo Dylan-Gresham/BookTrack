@@ -74,3 +74,15 @@ export function openDownloadDB(e: React.MouseEvent<HTMLButtonElement>) {
     "https://github.com/Dylan-Gresham/BookTrack/blob/nextjs/guides/Download_Your_Database.md",
   );
 }
+
+export function openFranciscoMurguiaGitHubPage(e: any) {
+  e.preventDefault();
+
+  open("https://github.com/FranciscoMurguia");
+}
+
+export function openBrenekGitHubPage(e: any) {
+  e.preventDefault();
+
+  open("https://github.com/BrenekH");
+}
