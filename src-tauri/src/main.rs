@@ -11,8 +11,9 @@ use config::Config;
 use tauri::{Manager, State};
 
 // 3rd-party crate imports
-use libsql::{Builder, Connection};
+use libsql::{params, Builder, Connection};
 use serde::{Deserialize, Serialize};
+use futures::lock;
 
 // Define the Error struct
 #[derive(Serialize, Debug)]
@@ -36,11 +37,11 @@ where
 
 // Define the struct for Database entries
 
-/// # Booktrack::DBItem
+/// # Booktrack::Book
 ///
 /// Struct used for holding database entries.
 #[derive(Deserialize, Serialize, Debug, Clone)]
-pub struct DBItem {
+pub struct Book {
     id: u64,
     title: String,
     author: String,
@@ -51,15 +52,55 @@ pub struct DBItem {
     list: String,
 }
 
+// Define the struct for Database entries with each field being optional. This is used for making
+// the Google Books API request. Some books may not have all the fields so having them be optional
+// allows for us to make the requests safely.
+
+/// # Booktrack::BookOpt
+///
+/// Struct used for holding database entries.
+#[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct ImageLinks {
+    small_thumbnail: Option<String>,
+    thumbnail: Option<String>,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct VolumeInfo {
+    title: Option<String>,
+    authors: Option<Vec<String>>,
+    page_count: usize,
+    description: Option<String>,
+    image_links: Option<ImageLinks>,
+    language: Option<String>,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct BookOpt {
+    id: Option<String>,
+    volume_info: Option<VolumeInfo>,
+    list: Option<String>,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct GbApiResult {
+    total_items: usize,
+    items: Vec<BookOpt>,
+}
+
 // Define state structs
 
 struct DbConnection {
-    conn: Mutex<Option<libsql::Connection>>,
+    conn: lock::Mutex<Option<libsql::Connection>>,
 }
 
 #[derive(Serialize, Deserialize)]
 struct BookList {
-    list: Mutex<Vec<DBItem>>,
+    list: Mutex<Vec<Book>>,
 }
 
 // Alias function for readability
@@ -109,9 +150,9 @@ async fn get_db_connection() -> Result<Connection> {
 ///
 /// ## Returns
 ///
-/// Either a Vector of DBItems containing every database entry or an error message.
+/// Either a Vector of Books containing every database entry or an error message.
 #[tauri::command]
-async fn get_all_books() -> Result<Vec<DBItem>> {
+async fn get_all_books() -> Result<Vec<Book>> {
     let db_connection = match get_db_connection().await {
         Ok(conn) => conn,
         Err(msg) => return Err(msg),
@@ -119,9 +160,9 @@ async fn get_all_books() -> Result<Vec<DBItem>> {
 
     let mut results = db_connection.query("SELECT * FROM dylan", ()).await?;
 
-    let mut books: Vec<DBItem> = Vec::new();
+    let mut books: Vec<Book> = Vec::new();
     while let Some(row) = results.next().await? {
-        let book: DBItem = DBItem {
+        let book: Book = Book {
             id: row.get(0)?,
             title: row.get(1)?,
             author: row.get(2)?,
@@ -183,13 +224,151 @@ fn print_to_console(msg: String) {
 }
 
 #[tauri::command]
-fn add_to_booklist(book: DBItem, state: State<BookList>) {
+async fn make_gb_api_req(title: Option<String>, author: Option<String>) -> std::result::Result<GbApiResult, String> {
+    let client = reqwest::Client::new();
+
+    let book_lang = String::from("en");
+
+    let book_title = title.unwrap_or_default();
+
+    let book_author = author.unwrap_or_default();
+
+    let url: String = match (book_title.is_empty(), book_author.is_empty()) {
+        (false, false) => format!("https://www.googleapis.com/books/v1/volumes?q={}+{}&printType=books", book_title, book_author),
+        (false, true) => format!("https://www.googleapis.com/books/v1/volumes?q={}&printType=books", book_title),
+        (true, false) => format!("https://www.googleapis.com/books/v1/volumes?q={}&printType=books", book_author),
+        _ => return Err(String::from("Both title and author are empty. Unable to make API request.")),
+    };
+
+    let mut api_result: GbApiResult = match client.get(url).send().await {
+        Ok(res) => {
+            match res.json().await {
+                Ok(api_res) => api_res,
+                Err(api_conv_err) => return Err(api_conv_err.to_string()),
+            }
+        }
+        Err(e) => return Err(e.to_string()),
+    };
+
+    api_result.items.retain(|vol|  {
+        if let Some(vol_info) = &vol.volume_info {
+            if let Some(lang) = &vol_info.language {
+                if *lang == book_lang {
+                    vol_info.page_count > 0
+                } else {
+                    false
+                }
+            } else {
+                false
+            }
+        } else {
+            false
+        }
+    });
+
+    if api_result.items.len() > 10 {
+        api_result.items = api_result.items[0..10].to_vec();
+    }
+    api_result.total_items = api_result.items.len();
+
+    Ok(api_result)
+}
+
+async fn complete_book(book: &mut Book) {
+    let gb_res = match make_gb_api_req(Some(book.title.clone()), Some(book.author.clone())).await {
+        Ok(res) => res,
+        Err(e) => {
+            eprintln!("Error making Google Books API Request.\nError:\n\t{e}");
+            return;
+        }
+    };
+
+    if let Some(item) = gb_res.items.first() {
+        match &item.volume_info {
+            Some(info) => {
+                if book.synopsis.is_empty() {
+                    match &info.description {
+                        Some(desc) => book.synopsis = desc.to_string(),
+                        None => (),
+                    }
+                }
+
+                if book.title.is_empty() {
+                    match &info.title {
+                        Some(title) => book.title = title.to_string(),
+                        None => (),
+                    }
+                }
+
+                if book.author.is_empty() {
+                    match &info.authors {
+                        Some(authors) => {
+                            if !authors.is_empty() {
+                                book.author = authors[0].to_string();
+                            }
+                        }
+                        None => (),
+                    }
+                }
+
+                if book.image.is_empty() {
+                    match &info.image_links {
+                        Some(links) => {
+                            if let Some(thumbnail) = &links.thumbnail {
+                                book.image = thumbnail.to_string();
+                            } else if let Some(small_thumbnail) = &links.small_thumbnail {
+                                book.image = small_thumbnail.to_string();
+                            }
+                        }
+                        None => (),
+                    }
+                }
+
+                if book.total_pages == 0 {
+                    book.total_pages = info.page_count as u32;
+                }
+            }
+            None => (),
+        }
+    }
+}
+
+#[tauri::command]
+async fn update_db(conn: State<'_, DbConnection>, book_list: State<'_, BookList>, mut book: Book) -> std::result::Result<(), ()> {
+    complete_book(&mut book).await;
+    add_to_booklist(book.clone(), book_list);
+
+    match &mut *conn.conn.lock().await {
+        Some(connection) => {
+            match connection.execute(
+                "INSERT INTO books (id, title, author, totalPages, pagesRead, synopsis, link, list, label) VALUES ()",
+                params![book.id, book.title, book.author, book.total_pages, book.pages_read, book.synopsis, book.image, book.list, 1],
+            ).await {
+                Ok(_) => {
+                    println!("Database successfully updated.");
+                    Ok(())
+                }
+                Err(e) => {
+                    eprintln!("Erorr executing the SQL query.\nError\n\t{e}");
+                    Err(())
+                }
+            }
+        }
+        None => {
+            eprintln!("No database connection exists!");
+            Err(())
+        }
+    }
+}
+
+#[tauri::command]
+fn add_to_booklist(book: Book, state: State<BookList>) {
     state.list.lock().unwrap().push(book);
 }
 
 #[tauri::command]
 async fn refresh_db_connection(state: State<'_, DbConnection>) -> Result<()> {
-    *state.conn.lock().unwrap() = match get_db_connection().await {
+    *state.conn.lock().await = match get_db_connection().await {
         Ok(c) => Some(c),
         Err(_) => None,
     };
@@ -203,12 +382,12 @@ fn get_config_from_state(state: State<Mutex<Config>>) -> Config {
 }
 
 #[tauri::command]
-fn get_booklist_from_state(state: State<BookList>) -> Vec<DBItem> {
+fn get_booklist_from_state(state: State<BookList>) -> Vec<Book> {
     state.list.lock().unwrap().to_vec()
 }
 
 fn initialize_booklist() -> BookList {
-    let mut books: Vec<DBItem> = Vec::with_capacity(25);
+    let mut books: Vec<Book> = Vec::with_capacity(25);
 
     println!("Initializing book list...");
 
@@ -235,7 +414,7 @@ fn main() {
     tauri::Builder::default()
         .manage(initialize_booklist())
         .manage(Mutex::new(get_config()))
-        .manage(DbConnection { conn: Mutex::new(None) })
+        .manage(DbConnection { conn: lock::Mutex::new(None) })
         .setup(|app: &mut tauri::App| {
             // Get the app and windows
             let splashscreen_window = app
@@ -283,10 +462,12 @@ fn main() {
             get_all_books,
             update_config,
             add_to_booklist,
+            update_db,
             refresh_db_connection,
             get_config_from_state,
             get_booklist_from_state,
             print_to_console,
+            make_gb_api_req,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
