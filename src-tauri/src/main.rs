@@ -240,16 +240,12 @@ async fn make_gb_api_req(title: Option<String>, author: Option<String>) -> std::
         None => String::new(),
     };
 
-    let url: String;
-    if !book_title.is_empty() && !book_author.is_empty() {
-        url = format!("https://www.googleapis.com/books/v1/volumes?q={}+{}&printType=books", book_title, book_author);
-    } else if !book_title.is_empty() {
-        url = format!("https://www.googleapis.com/books/v1/volumes?q={}&printType=books", book_title);
-    } else if !book_author.is_empty() {
-        url = format!("https://www.googleapis.com/books/v1/volumes?q={}&printType=books", book_author);
-    } else {
-        return Err(String::from("Both title and author are empty. Unable to make API request."));
-    }
+    let url: String = match (book_title.is_empty(), book_author.is_empty()) {
+        (false, false) => format!("https://www.googleapis.com/books/v1/volumes?q={}+{}&printType=books", book_title, book_author),
+        (false, true) => format!("https://www.googleapis.com/books/v1/volumes?q={}&printType=books", book_title),
+        (true, false) => format!("https://www.googleapis.com/books/v1/volumes?q={}&printType=books", book_author),
+        _ => return Err(String::from("Both title and author are empty. Unable to make API request.")),
+    };
 
     let mut api_result: GbApiResult = match client.get(url).send().await {
         Ok(res) => {
