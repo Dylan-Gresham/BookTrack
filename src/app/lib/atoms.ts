@@ -11,7 +11,7 @@ export interface UserInfo {
 }
 
 export interface LibrarySortState {
-  sortBy: "title" | "author" | "pageCount";
+  sortBy: "title" | "author" | "pageCount" | "default";
   order: "ascending" | "descending";
 }
 
@@ -21,4 +21,4 @@ export const userInfoAtom = atom<UserInfo | null>(null);
 export const registeredBookListsAtom = atom<string[]>([]);
 
 // Shared state between Header component and library page for how the library should be sorted
-export const librarySortAtom = atom<LibrarySortState | null>(null);
+export const librarySortAtom = atom<LibrarySortState>({sortBy: "default", order: "descending"});

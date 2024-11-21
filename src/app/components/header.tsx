@@ -3,13 +3,14 @@ import Link from "next/link";
 
 // Jotai imports
 import { userInfoAtom, librarySortAtom } from "../lib/atoms";
-import { useAtomValue } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 
 // CSS imports
 import styles from "../styles/header.module.css";
 
 export default function Header({ inLibrary = false }: { inLibrary: boolean }) {
   const userInfo = useAtomValue(userInfoAtom);
+  let [librarySortValue, setLibrarySort] = useAtom(librarySortAtom);
 
   if (userInfo !== null && userInfo.userConfig.username !== "") {
     return (
@@ -32,25 +33,27 @@ export default function Header({ inLibrary = false }: { inLibrary: boolean }) {
               New List
             </button>
 
-            <select name="library-sort-by" id="library-sort-by">
-              <option value="no-sort">No Sort</option>
+            <select name="library-sort-by" id="library-sort-by" value={librarySortValue.sortBy} onChange={(e) => {
+              const newSortKey = e.target.value as "default" | "title" | "author" | "pageCount";
+
+              if (newSortKey === librarySortValue.sortBy) {
+                if (librarySortValue.order === "descending") {
+                  librarySortValue.order = "ascending";
+                } else {
+                  librarySortValue.order = "descending";
+                }
+              } else {
+                librarySortValue.sortBy = newSortKey;
+                librarySortValue.order = "descending";
+              }
+
+              setLibrarySort({sortBy: librarySortValue.sortBy, order: librarySortValue.order});
+            }}>
+              <option value="default">No Sort</option>
               <option value="title">Title</option>
               <option value="author">Author</option>
-              <option value="page-count">Page Count</option>
+              <option value="pageCount">Page Count</option>
             </select>
-
-            <button
-              type="button"
-              className={styles.libraryControlButton}
-              onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                e.preventDefault();
-                e.stopPropagation();
-
-                console.log("Sort button TODO!");
-              }}
-            >
-              Sort
-            </button>
 
             <button
               type="button"
