@@ -14,7 +14,6 @@ use tauri::{Manager, State};
 use libsql::{params, Builder, Connection};
 use serde::{Deserialize, Serialize};
 use futures::lock;
-use reqwest;
 
 // Define the Error struct
 #[derive(Serialize, Debug)]
@@ -230,15 +229,9 @@ async fn make_gb_api_req(title: Option<String>, author: Option<String>) -> std::
 
     let book_lang = String::from("en");
 
-    let book_title = match title {
-        Some(t) => t,
-        None => String::new(),
-    };
+    let book_title = title.unwrap_or_default();
 
-    let book_author = match author {
-        Some(a) => a,
-        None => String::new(),
-    };
+    let book_author = author.unwrap_or_default();
 
     let url: String = match (book_title.is_empty(), book_author.is_empty()) {
         (false, false) => format!("https://www.googleapis.com/books/v1/volumes?q={}+{}&printType=books", book_title, book_author),
@@ -257,15 +250,11 @@ async fn make_gb_api_req(title: Option<String>, author: Option<String>) -> std::
         Err(e) => return Err(e.to_string()),
     };
 
-    api_result.items = api_result.items.into_iter().filter(|vol|  {
+    api_result.items.retain(|vol|  {
         if let Some(vol_info) = &vol.volume_info {
             if let Some(lang) = &vol_info.language {
                 if *lang == book_lang {
-                    if vol_info.page_count > 0 {
-                        true
-                    } else {
-                        false
-                    }
+                    vol_info.page_count > 0
                 } else {
                     false
                 }
@@ -275,7 +264,7 @@ async fn make_gb_api_req(title: Option<String>, author: Option<String>) -> std::
         } else {
             false
         }
-    }).collect();
+    });
 
     if api_result.items.len() > 10 {
         api_result.items = api_result.items[0..10].to_vec();
@@ -294,56 +283,53 @@ async fn complete_book(book: &mut Book) {
         }
     };
 
-    match gb_res.items.first() {
-        Some(item) => {
-            match &item.volume_info {
-                Some(info) => {
-                    if book.synopsis.is_empty() {
-                        match &info.description {
-                            Some(desc) => book.synopsis = desc.to_string(),
-                            None => (),
-                        }
-                    }
-
-                    if book.title.is_empty() {
-                        match &info.title {
-                            Some(title) => book.title = title.to_string(),
-                            None => (),
-                        }
-                    }
-
-                    if book.author.is_empty() {
-                        match &info.authors {
-                            Some(authors) => {
-                                if authors.len() > 0 {
-                                    book.author = authors[0].to_string();
-                                }
-                            }
-                            None => (),
-                        }
-                    }
-
-                    if book.image.is_empty() {
-                        match &info.image_links {
-                            Some(links) => {
-                                if let Some(thumbnail) = &links.thumbnail {
-                                    book.image = thumbnail.to_string();
-                                } else if let Some(small_thumbnail) = &links.small_thumbnail {
-                                    book.image = small_thumbnail.to_string();
-                                }
-                            }
-                            None => (),
-                        }
-                    }
-
-                    if book.total_pages == 0 {
-                        book.total_pages = info.page_count as u32;
+    if let Some(item) = gb_res.items.first() {
+        match &item.volume_info {
+            Some(info) => {
+                if book.synopsis.is_empty() {
+                    match &info.description {
+                        Some(desc) => book.synopsis = desc.to_string(),
+                        None => (),
                     }
                 }
-                None => (),
+
+                if book.title.is_empty() {
+                    match &info.title {
+                        Some(title) => book.title = title.to_string(),
+                        None => (),
+                    }
+                }
+
+                if book.author.is_empty() {
+                    match &info.authors {
+                        Some(authors) => {
+                            if !authors.is_empty() {
+                                book.author = authors[0].to_string();
+                            }
+                        }
+                        None => (),
+                    }
+                }
+
+                if book.image.is_empty() {
+                    match &info.image_links {
+                        Some(links) => {
+                            if let Some(thumbnail) = &links.thumbnail {
+                                book.image = thumbnail.to_string();
+                            } else if let Some(small_thumbnail) = &links.small_thumbnail {
+                                book.image = small_thumbnail.to_string();
+                            }
+                        }
+                        None => (),
+                    }
+                }
+
+                if book.total_pages == 0 {
+                    book.total_pages = info.page_count as u32;
+                }
             }
+            None => (),
         }
-        None => (),
     }
 }
 
