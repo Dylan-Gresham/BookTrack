@@ -55,6 +55,7 @@ export default function Library() {
       chunk = [];
     }
   }
+  splitUserBooks.push(chunk);
 
   let bgColor = "#CBC0AE";
   if (userInfo) {
