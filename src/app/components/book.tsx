@@ -1,13 +1,18 @@
 import Image from "next/image";
 
 import { BookType } from "../lib/booklist";
+import { clickedBookAtom } from "../lib/atoms";
+import { useRouter } from "next/navigation";
 
 import styles from "../styles/book.module.css";
 import Link from "next/link";
 
 import ProgressBar from "@ramonak/react-progress-bar";
+import { useSetAtom } from "jotai";
 
 export default function Book({ book }: { book: BookType }) {
+  const router = useRouter();
+  const setClickedBookAtom = useSetAtom(clickedBookAtom);
   let showPBar =
     book.list === "Completed" || book.list === "Planned" ? false : true;
   let barColor = undefined;
@@ -26,8 +31,22 @@ export default function Book({ book }: { book: BookType }) {
       break;
   }
 
+  function handleClick() {
+    setClickedBookAtom(book);
+    router.push("/edit-book");
+  }
+
   return (
-    <Link href="/edit-book" className={styles.bookCardLink}>
+    <Link
+      href="/edit-book"
+      className={styles.bookCardLink}
+      onClick={(e: any) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        handleClick();
+      }}
+    >
       <div className={styles.bookCard}>
         <Image
           src={book.image}

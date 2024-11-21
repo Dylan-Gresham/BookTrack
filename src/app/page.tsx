@@ -27,7 +27,7 @@ import {
 } from "./lib/openers";
 import { Config } from "./lib/config";
 import { userInfoAtom, UserInfo, registeredBookListsAtom } from "./lib/atoms";
-import { BookList, BookType, GbApiResult } from "./lib/booklist";
+import { BookList } from "./lib/booklist";
 
 // Define font
 const garamond500 = Cormorant_Garamond({ subsets: ["latin"], weight: "500" });
@@ -87,67 +87,6 @@ export default function Home() {
             are, this app makes it simple to organize your library, set personal
             goals, and stay motivated!
           </p>
-          {/* Testing button for running database get all query */}
-          <button
-            type="button"
-            onClick={async (e: any) => {
-              e.preventDefault();
-              e.stopPropagation();
-
-              let books: {
-                title: string;
-                author: string;
-                page_count: number;
-                pages_read: number;
-                image: string;
-              }[] = await invoke("get_all_books");
-              books.map((book) => console.log(book));
-            }}
-          >
-            Testing DB Button
-          </button>
-          <button
-            type="button"
-            onClick={async (e: any) => {
-              e.preventDefault();
-              e.stopPropagation();
-              let book: BookType = {
-                id: 0,
-                title: "Tokyo Ghoul",
-                author: "Sui Ishida",
-                total_pages: 2904,
-                pages_read: 2904,
-                synopsis:
-                  "The story follows Ken Kaneki, an 18-year old university student who barely survives a deadly encounter with Rize Kamishiro (his date who reveals herself as a ghoul and tries to eat him) when she gets hit by falling construction girders. He is taken to the hospital in critical condition. After recovering, Kaneki discovers that he underwent a surgery that transformed him into a half-ghoul. This was accomplished because some of Rize's organs were transferred into his body, and now, like normal ghouls, he must consume human flesh to survive. Ghouls who run a coffee shop called ''Anteiku'' take him in and teach him to deal with his new life as a half-ghoul. Some of his daily struggles include fitting into the ghoul society, as well as keeping his identity hidden from his human companions, especially from his best friend, Hideyoshi Nagachika.",
-                image: "",
-                list: "Completed",
-              };
-              let result: number = await invoke("predict", { book: book });
-              console.log(
-                `Tokyo Ghoul has a ${result} chance of being a good fit.`,
-              );
-            }}
-          >
-            Testing Predict Button
-          </button>
-          <button
-            type="button"
-            onClick={async (e: any) => {
-              e.preventDefault();
-              e.stopPropagation();
-
-              let results: GbApiResult | string = await invoke(
-                "make_gb_api_req",
-                {
-                  title: "Red Rising",
-                  author: "Pierce Brown",
-                },
-              );
-              console.log(results);
-            }}
-          >
-            Testing Google Books API Button
-          </button>
         </div>
         <div className={styles.typContainer}>
           <h1>Track Your Progress</h1>

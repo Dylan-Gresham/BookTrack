@@ -7,17 +7,9 @@
     border-radius: 0.5rem;
     max-width: 700px;
     max-height: fit-content;
-    min-width: 337px; /* Don't shrink the container for anything smaller than an iPhone SE */
 }
 
-.title {
-    margin-left: 0.5rem;
-    margin-bottom: 1.5rem;
-    font-weight: normal;
-    text-align: center;
-}
-
-.container > form {
+.container > .formContainer {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -26,23 +18,20 @@
     margin-bottom: 1rem;
 }
 
-.formGroup {
+.inputContainer {
     width: 85%;
     display: flex;
     flex-direction: column;
     gap: 0.1rem;
 }
 
-.formGroup > div > .label {
-    font-weight: normal;
-    display: flex;
-    align-items: center;
-}
-
-.formGroup > div {
-    display: flex;
-    justify-content: space-evenly;
-    align-items: center;
+.textInput {
+    border: 1px solid black;
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+    font-size: 1.25rem;
+    color: white;
+    background-color: #5D707F;
 }
 
 .label,
@@ -77,14 +66,14 @@
     border: 6px solid #5D707F;
 }
 
-.formButtons {
+.buttonContainer {
     margin-top: 1rem;
     display: flex;
     flex-direction: row-reverse;
     gap: 3rem;
 }
 
-.formButtons button {
+.buttonContainer button {
     padding: 0.25rem;
     background-color: #5D707F;
     color: #F0E5E9;

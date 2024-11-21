@@ -4,16 +4,26 @@ export interface BookType {
   title: string;
   author: string;
   image: string;
-  synopsis: string;
   total_pages: number;
   pages_read: number;
   list: string;
+  synopsis: string;
 }
 
-// Defining the GbApiResult interface
 export interface GbApiResult {
   volumes: BookType[];
 }
+
+export const DEFAULT_BOOK: BookType = {
+  id: 0,
+  title: "",
+  author: "",
+  image: "",
+  total_pages: 0,
+  pages_read: 0,
+  list: "",
+  synopsis: "",
+};
 
 // Defining the BookList type
 export type BookList = BookType[];
@@ -30,7 +40,8 @@ export function instanceOfBook(object: any): object is BookType {
     object.synopsis !== undefined &&
     object.totalPages !== undefined &&
     object.pagesRead !== undefined &&
-    object.list !== undefined
+    object.list !== undefined &&
+    object.synopsis !== undefined
   ) {
     return true;
   } else {

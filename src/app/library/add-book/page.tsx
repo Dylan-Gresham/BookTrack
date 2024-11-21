@@ -1,129 +1,149 @@
 "use client";
 
-// React imports
-import { useState } from "react";
-
-// Next.js imports
+// NextJS Imports
 import Link from "next/link";
 
-// Third-party imports
-import { Dropdown } from "primereact/dropdown";
+// React imports
+import { ChangeEvent, useState } from "react";
 
-// Jotai & atom imports
-import {
-  registeredBookListsAtom,
-  UserInfo,
-  userInfoAtom,
-} from "@/app/lib/atoms";
+// Tauri imports
+import { invoke } from "@tauri-apps/api";
+
+// Jotai imports
+import { registeredBookListsAtom, userInfoAtom } from "@/app/lib/atoms";
 import { useAtom, useAtomValue } from "jotai";
 
 // Library imports
-import { BookList, BookType, GbApiResult } from "@/app/lib/booklist";
-import { invoke } from "@tauri-apps/api";
-import { Config, defaultConfig } from "@/app/lib/config";
+import { BookType, DEFAULT_BOOK } from "../../lib/booklist";
+
+// Third party imporst
+import { Dropdown } from "primereact/dropdown";
+
+// Style imports
+import styles from "@/app/styles/editBook.module.css";
 
 export default function Page() {
-  const [userInfo, setUserInfo] = useAtom<UserInfo | null>(userInfoAtom);
-  let numBooks = userInfo !== null ? userInfo.userBooks.length : 0;
-  const [book, setBook] = useState<BookType>({
-    id: numBooks,
-    title: "",
-    author: "",
-    image: "",
-    synopsis: "",
-    total_pages: 0,
-    pages_read: 0,
-    list: "Planned",
-  });
-  const lists = useAtomValue<Array<string>>(registeredBookListsAtom);
+  const lists = useAtomValue(registeredBookListsAtom);
+  const [newBook, setNewBook] = useState<BookType>(DEFAULT_BOOK);
+  const [userInfo, setUserInfo] = useAtom(userInfoAtom);
 
-  async function insertNewBook() {
-    let gb_api_res: GbApiResult = await invoke("make_gb_api_req", {
-      title: book.title,
-      author: book.author,
-    });
+  async function addBook(newBook: BookType) {
+    if (userInfo) {
+      let newUserBooks: Array<BookType> = userInfo.userBooks;
 
-    let imageLink = gb_api_res.volumes[0].image;
-    let synopsis = gb_api_res.volumes[0].synopsis;
+      newUserBooks.push({
+        ...newBook,
+        id: Math.max(...userInfo.userBooks.map((book) => book.id)) + 1,
+      });
 
-    let newBook: BookType = { ...book, image: imageLink, synopsis: synopsis };
-    let newUserBooks: BookList = userInfo !== null ? userInfo.userBooks : [];
-    newUserBooks.push(newBook);
+      await invoke("update_db", { book: newBook });
 
-    await invoke("update_db", { book: newBook });
-
-    setUserInfo({
-      userBooks: newUserBooks,
-      userConfig: userInfo !== null ? userInfo.userConfig : defaultConfig,
-    });
+      setUserInfo({ ...userInfo, userBooks: newUserBooks });
+    }
   }
 
   return (
-    <div>
-      <h1>Add a Book</h1>
-      <form>
-        <div>
-          <label>Title</label>
+    <div className={styles.container}>
+      <h1>Add a New Book</h1>
+      <form className={styles.formContainer}>
+        <div className={styles.inputContainer}>
+          <label className={styles.label} htmlFor="title">
+            Title:
+          </label>
           <input
             type="text"
+            className={styles.textInput}
+            value={newBook.title}
             placeholder="The Way of Kings"
-            value={book.title}
-            onChange={(e) => setBook({ ...book, title: e.target.value })}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              setNewBook({ ...newBook, title: e.target.value });
+            }}
+            name="title"
           />
         </div>
-        <div>
-          <label>Author</label>
+        <div className={styles.inputContainer}>
+          <label className={styles.label} htmlFor="author">
+            Author:
+          </label>
           <input
             type="text"
+            className={styles.textInput}
+            value={newBook.author}
             placeholder="Brandon Sanderson"
-            value={book.author}
-            onChange={(e) => setBook({ ...book, author: e.target.value })}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              setNewBook({ ...newBook, author: e.target.value });
+            }}
+            name="author"
           />
         </div>
-        <div>
-          <label>Total Number of Pages</label>
+        <div className={styles.inputContainer}>
+          <label className={styles.label} htmlFor="totPages">
+            Total Pages:
+          </label>
           <input
             type="number"
-            value={book.total_pages}
-            onChange={(e) =>
-              setBook({ ...book, total_pages: e.target.valueAsNumber })
-            }
+            value={newBook.total_pages}
+            name="totPages"
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              setNewBook({ ...newBook, total_pages: Number(e.target.value) });
+            }}
+            placeholder="0"
           />
         </div>
-        {book.list === "In Progress" && (
-          <div>
-            <label>Pages Read so Far</label>
-            <input
-              type="number"
-              value={book.pages_read}
-              onChange={(e) =>
-                setBook({ ...book, pages_read: e.target.valueAsNumber })
-              }
-            />
-          </div>
-        )}
-        <div>
-          <label>List</label>
+        <div className={styles.inputContainer}>
+          <label className={styles.label} htmlFor="pagRead">
+            Pages Read:
+          </label>
+          <input
+            type="number"
+            value={newBook.pages_read}
+            name="pagRead"
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              setNewBook({ ...newBook, pages_read: Number(e.target.value) });
+            }}
+            placeholder="0"
+          />
+        </div>
+        <div className={styles.inputContainer}>
+          <label className={styles.label} htmlFor="covImg">
+            Cover Image:
+          </label>
+          <input
+            type="url"
+            className={styles.textInput}
+            value={newBook.image}
+            placeholder="https://shorturl.at/LWvmJ"
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              setNewBook({ ...newBook, image: e.target.value });
+            }}
+            name="covImg"
+          />
+        </div>
+        <div className={styles.inputContainer}>
+          <label className={styles.label} htmlFor="list">
+            List:
+          </label>
           <Dropdown
-            value={book.list}
-            onChange={(e) => setBook({ ...book, list: e.value })}
+            value={newBook.list}
+            onChange={(e) => setNewBook({ ...newBook, list: e.value })}
             options={lists}
             optionLabel="List"
             placeholder="Select a list"
+            name="name"
           />
         </div>
-        <div>
+        <div className={styles.buttonContainer}>
           <Link href="/library">
             <button type="button">Cancel</button>
           </Link>
           <Link href="/library">
             <button
               type="button"
-              onClick={async (_: React.MouseEvent<HTMLButtonElement>) => {
-                await insertNewBook();
+              onClick={async (_) => {
+                await addBook(newBook);
               }}
             >
-              Submit
+              Add Book
             </button>
           </Link>
         </div>

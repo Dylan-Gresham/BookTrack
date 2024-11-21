@@ -2,15 +2,13 @@
 use std::fs;
 
 // 3rd-party crate imports
-use dirs;
 use indoc::indoc;
 use serde::{Deserialize, Serialize};
-use serde_json;
 
 // Define constants
-pub static CONFIG_FILE: &'static str = "/config.json";
-pub static CONFIG_DIR: &'static str = "/booktrack";
-pub static DEFAULT_CONFIG: &'static str = indoc! {r#"
+pub static CONFIG_FILE: &str = "/config.json";
+pub static CONFIG_DIR: &str = "/booktrack";
+pub static DEFAULT_CONFIG: &str = indoc! {r#"
 {
     "username": "",
     "db_name": "",
@@ -115,7 +113,7 @@ pub fn read_config() -> Result<String, String> {
 
         match fs::read_to_string(config_file.clone()) {
             Ok(contents) => {
-                return Ok(contents);
+                Ok(contents)
             }
             Err(_) => {
                 // Create the parent directories
@@ -128,10 +126,10 @@ pub fn read_config() -> Result<String, String> {
                 match fs::write(config_file, DEFAULT_CONFIG) {
                     Ok(_) => {
                         println!("Default config file created");
-                        return Ok(DEFAULT_CONFIG.to_string());
+                        Ok(DEFAULT_CONFIG.to_string())
                     }
                     Err(_) => {
-                        return Err(String::from("Unable to create default config file"));
+                        Err(String::from("Unable to create default config file"))
                     }
                 }
             }
