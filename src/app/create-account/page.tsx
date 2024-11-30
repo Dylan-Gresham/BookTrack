@@ -22,7 +22,9 @@ import { Config } from "../lib/config";
 export default function Page() {
   // Define state variables
   const [userInfo, setUserInfo] = useAtom<UserInfo | null>(userInfoAtom);
-  const bookLists = useAtomValue<Array<string>>(registeredBookListsAtom);
+  const bookLists = useAtomValue<{ lists: Array<string>; open: boolean }>(
+    registeredBookListsAtom,
+  );
   const [startingName, _] = useState<string | null>(
     userInfo ? userInfo.userConfig.username : null,
   );
@@ -179,7 +181,7 @@ export default function Page() {
                   dbUrl: dbURL,
                   dbToken: dbToken,
                   theme: theme,
-                  bookLists: bookLists,
+                  bookLists: bookLists.lists,
                 })
                   .then((msg) => {
                     invoke("print_to_console", {

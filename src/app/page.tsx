@@ -37,7 +37,7 @@ export default function Home() {
   // Import the userInfo setter function
   //const setUserInfo = useSetAtom(userInfoAtom);
   const [userInfo, setUserInfo] = useAtom(userInfoAtom);
-  const [_, setRegBookList] = useAtom(registeredBookListsAtom);
+  const [regBookListObj, setRegBookListObj] = useAtom(registeredBookListsAtom);
 
   // Define guides scroller
   const guidesRef = useRef() as MutableRefObject<HTMLDivElement>;
@@ -62,7 +62,7 @@ export default function Home() {
 
       setUserInfo(newUserInfo);
 
-      setRegBookList(userConfig.book_lists);
+      setRegBookListObj({ ...regBookListObj, lists: userConfig.book_lists });
     };
 
     initialize().catch((err) => console.error(err));

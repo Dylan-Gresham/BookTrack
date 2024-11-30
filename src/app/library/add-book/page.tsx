@@ -126,7 +126,7 @@ export default function Page() {
           <Dropdown
             value={newBook.list}
             onChange={(e) => setNewBook({ ...newBook, list: e.value })}
-            options={lists}
+            options={lists.lists}
             optionLabel="List"
             placeholder="Select a list"
             name="name"

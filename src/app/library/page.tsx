@@ -58,7 +58,7 @@ export default function Library() {
       <Header inLibrary={true} />
       <main className={styles.libraryMain} style={{ backgroundColor: bgColor }}>
         {userBooks.length > 0 &&
-          registeredLists.map((list: string) => {
+          registeredLists.lists.map((list: string) => {
             return (
               <div className={styles.rowContainer} style={{ gridRow: row++ }}>
                 <h3 className={styles.listTitle}>

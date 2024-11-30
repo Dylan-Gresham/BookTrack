@@ -223,6 +223,24 @@ fn update_config(
 }
 
 #[tauri::command]
+fn update_lists(new_list: String, state: State<Mutex<Config>>) -> Result<String> {
+    let mut state = state.lock()?;
+    state.book_lists.push(new_list);
+
+    config::write_config(Config {
+        username: state.username.clone(),
+        db_name: state.db_name.clone(),
+        db_url: state.db_url.clone(),
+        db_token: state.db_token.clone(),
+        theme: state.theme.clone(),
+        book_lists: state.book_lists.clone(),
+    })
+    .map_err(|e| Error { msg: e })?;
+
+    Ok(String::from("Success"))
+}
+
+#[tauri::command]
 fn print_to_console(msg: String) {
     println!("{}", msg);
 }
@@ -514,6 +532,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             get_all_books,
             update_config,
+            update_lists,
             add_to_booklist,
             update_db,
             update_book_in_db,

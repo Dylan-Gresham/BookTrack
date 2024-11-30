@@ -20,35 +20,38 @@ export default function Header({ inLibrary = false }: { inLibrary: boolean }) {
         </Link>
         {inLibrary && (
           <div className={styles.libraryControls}>
-            <button
-              type="button"
-              className={styles.libraryControlButton}
-              onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                e.preventDefault();
-                e.stopPropagation();
+            <Link href="/add-list">
+              <button type="button" className={styles.libraryControlButton}>
+                New List
+              </button>
+            </Link>
+            <select
+              name="library-sort-by"
+              id="library-sort-by"
+              value={librarySortValue.sortBy}
+              onChange={(e) => {
+                const newSortKey = e.target.value as
+                  | "default"
+                  | "title"
+                  | "author"
+                  | "pageCount";
 
-                console.log("New List button TODO!");
+                if (newSortKey !== librarySortValue.sortBy) {
+                  librarySortValue.sortBy = newSortKey;
+                  librarySortValue.order = "descending";
+                }
+
+                setLibrarySort({
+                  sortBy: librarySortValue.sortBy,
+                  order: librarySortValue.order,
+                });
               }}
             >
-              New List
-            </button>
-
-            <select name="library-sort-by" id="library-sort-by" value={librarySortValue.sortBy} onChange={(e) => {
-              const newSortKey = e.target.value as "default" | "title" | "author" | "pageCount";
-
-              if (newSortKey !== librarySortValue.sortBy) {
-                librarySortValue.sortBy = newSortKey;
-                librarySortValue.order = "descending";
-              }
-
-              setLibrarySort({sortBy: librarySortValue.sortBy, order: librarySortValue.order});
-            }}>
               <option value="default">No Sort</option>
               <option value="title">Title</option>
               <option value="author">Author</option>
               <option value="pageCount">Page Count</option>
             </select>
-
             <button
               type="button"
               className={styles.libraryControlButton}
@@ -62,12 +65,14 @@ export default function Header({ inLibrary = false }: { inLibrary: boolean }) {
                   librarySortValue.order = "descending";
                 }
 
-                setLibrarySort({...librarySortValue, order: librarySortValue.order});
+                setLibrarySort({
+                  ...librarySortValue,
+                  order: librarySortValue.order,
+                });
               }}
             >
               {librarySortValue.order === "descending" ? "↓" : "↑"}
             </button>
-
             <Link href="/library/add-book">
               <button type="button" className={styles.libraryControlButton}>
                 New Book
