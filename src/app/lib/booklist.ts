@@ -1,3 +1,6 @@
+// Constants
+export const CHUNK_SIZE: number = 5;
+
 // Defining the Book interface
 export interface BookType {
   id: number;

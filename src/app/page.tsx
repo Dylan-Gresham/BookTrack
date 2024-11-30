@@ -68,8 +68,6 @@ export default function Home() {
     initialize().catch((err) => console.error(err));
   }, []);
 
-  console.log(userInfo);
-
   return (
     <>
       <Header inLibrary={false} />

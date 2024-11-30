@@ -343,9 +343,7 @@ async fn complete_book(book: &mut Book) {
 
 fn update_booklist(book: Book, state: State<BookList>) {
     let mut list = state.list.lock().unwrap();
-    let old_book: Book = std::mem::replace(&mut list[book.id as usize], book.clone());
-
-    println!("Replaced {old_book:?} with {book:?}");
+    let _ = std::mem::replace(&mut list[book.id as usize], book.clone());
 }
 
 #[tauri::command]
@@ -358,10 +356,7 @@ async fn update_book_in_db(conn: State<'_, DbConnection>, book_list: State<'_, B
                 "UPDATE dylan SET title = ?1, author = ?2, totalPages = ?3, pagesRead = ?4, link = ?5, list = ?6 WHERE id = ?7",
                 params![book.title, book.author, book.total_pages, book.pages_read, book.image, book.list, book.id],
             ).await {
-                Ok(_) => {
-                    println!("Database successfully updated.");
-                    Ok(())
-                }
+                Ok(_) => Ok(()),
                 Err(e) => {
                     eprintln!("Erorr executing the SQL query.\nError\n\t{e}");
                     Err(())
@@ -431,8 +426,6 @@ fn get_booklist_from_state(state: State<BookList>) -> Vec<Book> {
 fn initialize_booklist() -> BookList {
     let mut books: Vec<Book> = Vec::with_capacity(25);
 
-    println!("Initializing book list...");
-
     match tokio::runtime::Runtime::new()
         .expect("Unable to create a Tokio runtime")
         .block_on(get_all_books())
@@ -440,10 +433,6 @@ fn initialize_booklist() -> BookList {
         Ok(books_db) => books.extend(books_db),
         Err(_) => eprintln!("Get all books returned none"),
     };
-
-    println!("{:?}", books);
-
-    println!("Done initializing book list!");
 
     BookList {
         list: Mutex::new(books),
@@ -494,16 +483,14 @@ fn main() {
 
             // Perform initialization on a new task so app doesn't freeze
             tauri::async_runtime::spawn(async move {
-                println!("Initializing database connection...");
-
                 match refresh_db_connection(app_handle.state()).await {
-                    Ok(_) => println!("Done initializing database connection!"),
+                    Ok(_) => (),
                     Err(_) => {
                         let mut attempts = 0;
                         loop {
                             if attempts == 10 { break; }
                             match refresh_db_connection(app_handle.state()).await {
-                                Ok(_) => println!("Done initializing database connection!"),
+                                Ok(_) => (),
                                 Err(_) => {
                                     attempts += 1;
                                     continue;

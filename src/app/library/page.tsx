@@ -8,14 +8,16 @@ import Header from "../components/header";
 import Book from "../components/book";
 
 // Library imports
-import { registeredBookListsAtom, userInfoAtom, librarySortAtom } from "../lib/atoms";
+import {
+  registeredBookListsAtom,
+  userInfoAtom,
+  librarySortAtom,
+} from "../lib/atoms";
 import { BookType } from "../lib/booklist";
 
 // CSS import
 import styles from "@/app/styles/library.module.css";
-
-// Define constants
-const CHUNK_SIZE = 5; // Library's row length
+import Link from "next/link";
 
 export default function Library() {
   const userInfo = useAtomValue(userInfoAtom);
@@ -44,19 +46,6 @@ export default function Library() {
     });
   }
 
-  let splitUserBooks: Array<Array<BookType>> = [];
-
-  let chunk: Array<BookType> = [];
-  for (let i = 0; i < userBooks.length; i++) {
-    chunk.push(userBooks[i]);
-
-    if ((i + 1) % CHUNK_SIZE === 0) {
-      splitUserBooks.push(chunk);
-      chunk = [];
-    }
-  }
-  splitUserBooks.push(chunk);
-
   let bgColor = "#CBC0AE";
   if (userInfo) {
     bgColor = userInfo.userConfig.theme === "dark" ? "#CBC0AE" : "#5D707F";
@@ -69,36 +58,36 @@ export default function Library() {
       <Header inLibrary={true} />
       <main className={styles.libraryMain} style={{ backgroundColor: bgColor }}>
         {userBooks.length > 0 &&
-          splitUserBooks.map((slice: Array<BookType>) => {
+          registeredLists.map((list: string) => {
             return (
-              <ul
-                key={i++}
-                className={styles.noBullets}
-                style={{ gridRow: row++ }}
-              >
-                {slice.map((book) => {
-                  return (
-                    <li key={book.id}>
-                      <Book book={book}></Book>
-                    </li>
-                  );
-                })}
-              </ul>
+              <div className={styles.rowContainer} style={{ gridRow: row++ }}>
+                <h3 className={styles.listTitle}>
+                  {list
+                    .split(" ")
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(" ")}
+                </h3>
+                <ul key={i++} className={styles.noBullets}>
+                  {userBooks &&
+                    userBooks
+                      .filter((book) => book.list === list)
+                      .map((book: BookType) => {
+                        return (
+                          <li key={book.id}>
+                            <Book book={book}></Book>
+                          </li>
+                        );
+                      })}
+                </ul>
+              </div>
             );
           })}
         {userBooks.length === 0 && (
-          <button
-            className={styles.centeredButton}
-            type="button"
-            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-              e.preventDefault();
-              e.stopPropagation();
-
-              console.log("TODO!");
-            }}
-          >
-            Add Book
-          </button>
+          <Link href="/library/add-book">
+            <button type="button" className={styles.libraryControlButton}>
+              New Book
+            </button>
+          </Link>
         )}
       </main>
     </>

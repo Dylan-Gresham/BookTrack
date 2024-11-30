@@ -112,14 +112,12 @@ pub fn read_config() -> Result<String, String> {
         config_file.push(CONFIG_FILE);
 
         match fs::read_to_string(config_file.clone()) {
-            Ok(contents) => {
-                Ok(contents)
-            }
+            Ok(contents) => Ok(contents),
             Err(_) => {
                 // Create the parent directories
                 match fs::create_dir_all(directories.clone()) {
                     Ok(_) => println!("Config file created {:?}", directories),
-                    Err(_) => println!("Config path either already exists or couldn't be created"),
+                    Err(_) => eprintln!("Config path either already exists or couldn't be created"),
                 }
 
                 // Create the config file
@@ -128,9 +126,7 @@ pub fn read_config() -> Result<String, String> {
                         println!("Default config file created");
                         Ok(DEFAULT_CONFIG.to_string())
                     }
-                    Err(_) => {
-                        Err(String::from("Unable to create default config file"))
-                    }
+                    Err(_) => Err(String::from("Unable to create default config file")),
                 }
             }
         }
@@ -158,7 +154,7 @@ pub fn write_config(config: Config) -> Result<(), String> {
         config_file.push(CONFIG_FILE);
 
         let serialized_string = serde_json::to_string_pretty(&config)
-            .map_err(|e| format!("error serializing config: {e}"))?;
+            .map_err(|e| format!("Error serializing config: {e}"))?;
 
         match fs::write(config_file, serialized_string) {
             Ok(_) => Ok(()),
