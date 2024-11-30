@@ -25,17 +25,16 @@ import {
   openSetup,
   openUpgrade,
 } from "./lib/openers";
-import { Config } from "./lib/config";
+import { Config, defaultConfig } from "./lib/config";
 import { userInfoAtom, UserInfo, registeredBookListsAtom } from "./lib/atoms";
 import { BookList } from "./lib/booklist";
+import { useRouter } from "next/navigation";
 
 // Define font
 const garamond500 = Cormorant_Garamond({ subsets: ["latin"], weight: "500" });
 
-// Home Component
 export default function Home() {
-  // Import the userInfo setter function
-  //const setUserInfo = useSetAtom(userInfoAtom);
+  const router = useRouter();
   const [userInfo, setUserInfo] = useAtom(userInfoAtom);
   const [regBookListObj, setRegBookListObj] = useAtom(registeredBookListsAtom);
 
@@ -66,6 +65,10 @@ export default function Home() {
     };
 
     initialize().catch((err) => console.error(err));
+
+    if (userInfo?.userConfig !== defaultConfig) {
+      router.push("/library");
+    }
   }, []);
 
   return (
