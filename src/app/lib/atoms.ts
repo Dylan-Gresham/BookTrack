@@ -18,6 +18,8 @@ export interface LibrarySortState {
 // Define atoms for user account details
 export const userInfoAtom = atom<UserInfo | null>(null);
 
+export const justLaunchedAtom = atom<boolean>(true);
+
 export const registeredBookListsAtom = atom<{ lists: string[]; open: boolean }>(
   { lists: [], open: false },
 );

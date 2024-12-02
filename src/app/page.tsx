@@ -26,7 +26,12 @@ import {
   openUpgrade,
 } from "./lib/openers";
 import { Config, defaultConfig } from "./lib/config";
-import { userInfoAtom, UserInfo, registeredBookListsAtom } from "./lib/atoms";
+import {
+  userInfoAtom,
+  UserInfo,
+  registeredBookListsAtom,
+  justLaunchedAtom,
+} from "./lib/atoms";
 import { BookList } from "./lib/booklist";
 import { useRouter } from "next/navigation";
 
@@ -37,6 +42,14 @@ export default function Home() {
   const router = useRouter();
   const [userInfo, setUserInfo] = useAtom(userInfoAtom);
   const [regBookListObj, setRegBookListObj] = useAtom(registeredBookListsAtom);
+  const [justLaunched, setJustLaunched] = useAtom<boolean>(justLaunchedAtom);
+
+  if (justLaunched) {
+    if (userInfo?.userConfig !== defaultConfig) {
+      setJustLaunched(false);
+      router.push("/library");
+    }
+  }
 
   // Define guides scroller
   const guidesRef = useRef() as MutableRefObject<HTMLDivElement>;
@@ -65,10 +78,6 @@ export default function Home() {
     };
 
     initialize().catch((err) => console.error(err));
-
-    if (userInfo?.userConfig !== defaultConfig) {
-      router.push("/library");
-    }
   }, []);
 
   return (
