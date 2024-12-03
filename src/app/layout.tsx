@@ -8,8 +8,6 @@ import { Providers } from "./components/providers";
 
 // CSS import
 import "./styles/globals.css";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,9 +26,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-          {/* This provider allows everything that gets rendered to access state variables from Jotai */}
-          <Providers>{children}</Providers>
-          <Footer />
+        {/* This provider allows everything that gets rendered to access state variables from Jotai */}
+        <Providers>{children}</Providers>
+        <Footer />
       </body>
     </html>
   );

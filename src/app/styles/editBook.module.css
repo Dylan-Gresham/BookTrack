@@ -79,3 +79,12 @@
     color: #F0E5E9;
 }
 
+.predictionContainer {
+    display: flex;
+    justify-content: space-between;
+}
+
+.predictionCloser {
+    cursor: pointer;
+    color: red;
+}

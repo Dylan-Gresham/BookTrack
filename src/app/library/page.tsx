@@ -60,20 +60,24 @@ export default function Library() {
         {userBooks.length > 0 &&
           registeredLists.lists.map((list: string) => {
             return (
-              <div className={styles.rowContainer} style={{ gridRow: row++ }}>
-                <h3 className={styles.listTitle}>
+              <div
+                key={`row${row}-div`}
+                className={styles.rowContainer}
+                style={{ gridRow: row }}
+              >
+                <h3 key={`row${row}=h3`} className={styles.listTitle}>
                   {list
                     .split(" ")
                     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
                     .join(" ")}
                 </h3>
-                <ul key={i++} className={styles.noBullets}>
+                <ul key={`row${row++}-ul`} className={styles.noBullets}>
                   {userBooks &&
                     userBooks
                       .filter((book) => book.list === list)
                       .map((book: BookType) => {
                         return (
-                          <li key={book.id}>
+                          <li key={i++}>
                             <Book book={book}></Book>
                           </li>
                         );

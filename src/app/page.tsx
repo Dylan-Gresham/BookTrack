@@ -4,7 +4,7 @@
 import { useRef, useEffect, MutableRefObject } from "react";
 
 // Jotai imports
-import { useAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 
 // Tauri imports
 import { invoke } from "@tauri-apps/api/tauri";
@@ -25,13 +25,8 @@ import {
   openSetup,
   openUpgrade,
 } from "./lib/openers";
-import { Config, defaultConfig } from "./lib/config";
-import {
-  userInfoAtom,
-  UserInfo,
-  registeredBookListsAtom,
-  justLaunchedAtom,
-} from "./lib/atoms";
+import { Config } from "./lib/config";
+import { userInfoAtom, UserInfo, registeredBookListsAtom } from "./lib/atoms";
 import { BookList } from "./lib/booklist";
 import { useRouter } from "next/navigation";
 
@@ -40,16 +35,8 @@ const garamond500 = Cormorant_Garamond({ subsets: ["latin"], weight: "500" });
 
 export default function Home() {
   const router = useRouter();
-  const [userInfo, setUserInfo] = useAtom(userInfoAtom);
+  const setUserInfo = useSetAtom(userInfoAtom);
   const [regBookListObj, setRegBookListObj] = useAtom(registeredBookListsAtom);
-  const [justLaunched, setJustLaunched] = useAtom<boolean>(justLaunchedAtom);
-
-  if (justLaunched) {
-    if (userInfo?.userConfig !== defaultConfig) {
-      setJustLaunched(false);
-      router.push("/library");
-    }
-  }
 
   // Define guides scroller
   const guidesRef = useRef() as MutableRefObject<HTMLDivElement>;
@@ -64,6 +51,7 @@ export default function Home() {
 
   // Define behavior to do on first render
   useEffect(() => {
+    router.prefetch("/library");
     const initialize = async () => {
       let userConfig = await invoke<Config & { book_lists: string[] }>(
         "get_config_from_state",

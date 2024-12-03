@@ -26,6 +26,10 @@ export default function Page() {
   const lists = useAtomValue(registeredBookListsAtom);
   const [newBook, setNewBook] = useState<BookType>(DEFAULT_BOOK);
   const [userInfo, setUserInfo] = useAtom(userInfoAtom);
+  const [prediction, setPrediction] = useState({
+    show: false,
+    prediction: 0.0,
+  });
 
   async function addBook(newBook: BookType) {
     if (userInfo) {
@@ -132,6 +136,19 @@ export default function Page() {
             name="name"
           />
         </div>
+        {prediction.show && (
+          <div className={styles.inputContainer}>
+            <div className={styles.predictionContainer}>
+              <p className={styles.predictionText}>Prediction...</p>
+              <p
+                className={styles.predictionCloser}
+                onClick={() => setPrediction({ show: false, prediction: 0.0 })}
+              >
+                &times;
+              </p>
+            </div>
+          </div>
+        )}
         <div className={styles.buttonContainer}>
           <Link href="/library">
             <button type="button">Cancel</button>
@@ -146,6 +163,16 @@ export default function Page() {
               Add Book
             </button>
           </Link>
+          <button
+            type="button"
+            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+              e.stopPropagation();
+              e.preventDefault();
+              setPrediction({ ...prediction, show: true });
+            }}
+          >
+            Evaluate
+          </button>
         </div>
       </form>
     </div>
