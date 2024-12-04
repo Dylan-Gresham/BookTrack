@@ -399,10 +399,7 @@ async fn update_db(conn: State<'_, DbConnection>, book_list: State<'_, BookList>
                 "INSERT INTO dylan (id, title, author, totalPages, pagesRead, synopsis, link, list, label) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
                 params![book.id, book.title, book.author, book.total_pages, book.pages_read, book.synopsis, book.image, book.list, 1],
             ).await {
-                Ok(_) => {
-                    println!("Database successfully updated.");
-                    Ok(())
-                }
+                Ok(_) => Ok(()),
                 Err(e) => {
                     eprintln!("Erorr executing the SQL query.\nError\n\t{e}");
                     Err(())
@@ -442,10 +439,7 @@ async fn delete_from_db(conn: State<'_, DbConnection>, book_list: State<'_, Book
                 "DELETE FROM dylan WHERE id = ?1",
                 params![removed_book.id],
             ).await {
-                Ok(_) => {
-                    println!("Successfully removed the book from the database");
-                    Ok(())
-                }
+                Ok(_) => Ok(()),
                 Err(_) => {
                     eprintln!("Failed to remove the book from the database");
                     Err(())
@@ -526,7 +520,6 @@ async fn comp_then_predict(state: State<'_, PyLib>, mut book: Book) -> Result<f6
     complete_book(&mut book).await;
     let result = ml::predict(&py_lib, book.title, book.author, book.total_pages.try_into().unwrap(), book.synopsis, book.list);
 
-    println!("{result:?}");
     match result {
         Ok(r) => Ok(r),
         Err(err) => {

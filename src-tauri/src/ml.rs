@@ -23,18 +23,7 @@ pub fn predict(
     });
 
     match result {
-        Ok(num) => {
-            let pos_prob = num * 100.0;
-            println!(
-                "There is a {:.2}% chance of the sample being the positive class.",
-                num * 100.0
-            );
-            println!(
-                "There is a {:.2}% chance of the sample being the negative class.",
-                (1.0 - num) * 100.0
-            );
-            Ok(pos_prob)
-        }
+        Ok(num) => Ok(num * 100.0),
         Err(err) => {
             eprintln!("{err}");
             Err(err.to_string())
