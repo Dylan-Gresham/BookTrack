@@ -298,7 +298,7 @@ def predict_rs(title, author, pages, synopsis, list, model="nb"):
 
         prepared = prepare_sample(sample)
 
-        return 1.0 - nb.predict_proba(prepared)[0][1]
+        return nb.predict_proba(prepared)[0][1]
     elif model == "forest":
         forest: RandomForestClassifier = joblib.load("model.joblib")
 

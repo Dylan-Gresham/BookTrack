@@ -8,6 +8,7 @@ import { ChangeEvent, useState } from "react";
 
 // Tauri imports
 import { invoke } from "@tauri-apps/api";
+import { message } from "@tauri-apps/api/dialog";
 
 // Jotai imports
 import { registeredBookListsAtom, userInfoAtom } from "@/app/lib/atoms";
@@ -26,10 +27,21 @@ export default function Page() {
   const lists = useAtomValue(registeredBookListsAtom);
   const [newBook, setNewBook] = useState<BookType>(DEFAULT_BOOK);
   const [userInfo, setUserInfo] = useAtom(userInfoAtom);
-  const [prediction, setPrediction] = useState({
-    show: false,
-    prediction: 0.0,
-  });
+
+  function validateInputs(): boolean {
+    let flag = true;
+    if (
+      newBook.title === "" ||
+      newBook.author !== "" ||
+      newBook.list !== "" ||
+      newBook.total_pages !== 0 ||
+      newBook.image === ""
+    ) {
+      flag = false;
+    }
+
+    return flag;
+  }
 
   async function addBook(newBook: BookType) {
     if (userInfo) {
@@ -91,7 +103,7 @@ export default function Page() {
             onChange={(e: ChangeEvent<HTMLInputElement>) => {
               setNewBook({ ...newBook, total_pages: Number(e.target.value) });
             }}
-            placeholder="0"
+            placeholder="1008"
           />
         </div>
         <div className={styles.inputContainer}>
@@ -116,7 +128,7 @@ export default function Page() {
             type="url"
             className={styles.textInput}
             value={newBook.image}
-            placeholder="https://shorturl.at/LWvmJ"
+            placeholder="https://m.media-amazon.com/images/I/81pJXhRLdoL.jpg"
             onChange={(e: ChangeEvent<HTMLInputElement>) => {
               setNewBook({ ...newBook, image: e.target.value });
             }}
@@ -136,19 +148,6 @@ export default function Page() {
             name="name"
           />
         </div>
-        {prediction.show && (
-          <div className={styles.inputContainer}>
-            <div className={styles.predictionContainer}>
-              <p className={styles.predictionText}>Prediction...</p>
-              <p
-                className={styles.predictionCloser}
-                onClick={() => setPrediction({ show: false, prediction: 0.0 })}
-              >
-                &times;
-              </p>
-            </div>
-          </div>
-        )}
         <div className={styles.buttonContainer}>
           <Link href="/library">
             <button type="button">Cancel</button>
@@ -165,10 +164,18 @@ export default function Page() {
           </Link>
           <button
             type="button"
-            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+            onClick={async (e: React.MouseEvent<HTMLButtonElement>) => {
               e.stopPropagation();
               e.preventDefault();
-              setPrediction({ ...prediction, show: true });
+
+              let prediction: number = await invoke("comp_then_predict", {
+                book: newBook,
+              });
+
+              await message(
+                `Brak thinks there's a ${prediction.toFixed(2)}%% chance that you enjoy ${newBook.title} by ${newBook.author}.`,
+                { title: "Brak Recommender", type: "info" },
+              );
             }}
           >
             Evaluate

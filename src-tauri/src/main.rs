@@ -416,6 +416,49 @@ async fn update_db(conn: State<'_, DbConnection>, book_list: State<'_, BookList>
     }
 }
 
+fn remove_from_booklist(book: Book, state: State<BookList>) -> std::result::Result<Book, ()> {
+    let mut book_list = state.list.lock().unwrap();
+    let index = match book_list.iter().position(|b| b.title == book.title && b.author == book.author) {
+        Some(idx) => idx,
+        None => return Err(()),
+    };
+
+    Ok(book_list.remove(index))
+}
+
+#[tauri::command]
+async fn delete_from_db(conn: State<'_, DbConnection>, book_list: State<'_, BookList>, book: Book) -> std::result::Result<(), ()> {
+    let removed_book = match remove_from_booklist(book.clone(), book_list) {
+        Ok(book) => book,
+        Err(_) => {
+            eprintln!("Unable to find book in book list");
+            return Err(());
+        }
+    };
+
+    match &mut *conn.conn.lock().await {
+        Some(connection) => {
+            match connection.execute(
+                "DELETE FROM dylan WHERE id = ?1",
+                params![removed_book.id],
+            ).await {
+                Ok(_) => {
+                    println!("Successfully removed the book from the database");
+                    Ok(())
+                }
+                Err(_) => {
+                    eprintln!("Failed to remove the book from the database");
+                    Err(())
+                }
+            }
+        }
+        None => {
+            eprintln!("No database connection exists!");
+            Err(())
+        }
+    }
+}
+
 #[tauri::command]
 fn add_to_booklist(book: Book, state: State<BookList>) {
     state.list.lock().unwrap().push(book);
@@ -458,20 +501,37 @@ fn initialize_booklist() -> BookList {
 }
 
 struct PyLib {
-    code: Mutex<String>,
+    code: lock::Mutex<String>,
 }
 
 #[tauri::command]
-fn predict(state: State<PyLib>, book: Book) -> f64 {
-    let py_lib = state.code.lock().unwrap();
+async fn predict(state: State<'_, PyLib>, book: Book) -> Result<f64> {
+    let py_lib = state.code.lock().await;
 
     let result = ml::predict(&py_lib, book.title, book.author, book.total_pages.try_into().unwrap(), book.synopsis, book.list);
 
     match result {
-        Ok(r) => r,
+        Ok(r) => Ok(r),
         Err(err) => {
             eprintln!("{}", err);
-            f64::MIN
+            Ok(f64::MIN)
+        }
+    }
+}
+
+#[tauri::command]
+async fn comp_then_predict(state: State<'_, PyLib>, mut book: Book) -> Result<f64> {
+    let py_lib = state.code.lock().await;
+
+    complete_book(&mut book).await;
+    let result = ml::predict(&py_lib, book.title, book.author, book.total_pages.try_into().unwrap(), book.synopsis, book.list);
+
+    println!("{result:?}");
+    match result {
+        Ok(r) => Ok(r),
+        Err(err) => {
+            eprintln!("{}", err);
+            Ok(f64::MIN)
         }
     }
 }
@@ -485,7 +545,7 @@ fn main() {
 
     tauri::Builder::default()
         .manage(initialize_booklist())
-        .manage(PyLib { code: Mutex::new(py_lib) })
+        .manage(PyLib { code: lock::Mutex::new(py_lib) })
         .manage(DbConnection { conn: lock::Mutex::new(None) })
         .manage(Mutex::new(get_config()))
         .setup(|app: &mut tauri::App| {
@@ -535,14 +595,15 @@ fn main() {
             update_lists,
             add_to_booklist,
             update_db,
+            delete_from_db,
             update_book_in_db,
             refresh_db_connection,
             get_config_from_state,
             get_booklist_from_state,
             predict,
+            comp_then_predict,
             make_gb_api_req,
             print_to_console,
-            make_gb_api_req,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

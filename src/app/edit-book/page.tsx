@@ -25,6 +25,7 @@ import { Dropdown } from "primereact/dropdown";
 
 // Style imports
 import styles from "@/app/styles/editBook.module.css";
+import { ask } from "@tauri-apps/api/dialog";
 
 export default function Page() {
   const clickedBook = useAtomValue(clickedBookAtom);
@@ -131,6 +132,25 @@ export default function Page() {
           />
         </div>
         <div className={styles.buttonContainer}>
+          <button
+            type="button"
+            style={{ backgroundColor: "#913521" }}
+            onClick={async (e: React.MouseEvent<HTMLButtonElement>) => {
+              e.preventDefault();
+              e.stopPropagation();
+
+              const yes = await ask(
+                `Are you sure you want to delete ${newBook.title} by ${newBook.author} from your library? If you want to add it back later you won't be able to recover this information.`,
+                { title: "Delete this book?", type: "warning" },
+              );
+
+              if (yes && clickedBook) {
+                await invoke("delete_from_db", { book: clickedBook });
+              }
+            }}
+          >
+            Delete
+          </button>
           <Link href="/library">
             <button type="button">Cancel</button>
           </Link>
